@@ -1,3 +1,5 @@
+GROUP MEMBERS:
+ASLIDDIN  25013371
 # 🎬 CINEMATCH (C version) — Movie & Game Recommender
 
 A console Movie & Game recommendation quiz in C. Answer 5 questions and the
