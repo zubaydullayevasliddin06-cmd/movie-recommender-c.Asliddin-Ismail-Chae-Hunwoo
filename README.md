@@ -1,4 +1,5 @@
 GROUP MEMBERS:
+ISMAIL A F ASIF 25013353
 ASLIDDIN  25013371
 # 🎬 CINEMATCH (C version) — Movie & Game Recommender
 
