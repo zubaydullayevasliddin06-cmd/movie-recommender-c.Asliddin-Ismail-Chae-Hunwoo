@@ -1,0 +1,14 @@
+# Secrets — NEVER commit your API key
+.env
+server/.env
+
+# Node dependencies (re-created with "npm install")
+node_modules/
+
+# Compiled C output (re-created by compiling)
+*.exe
+*.o
+
+# OS junk
+.DS_Store
+Thumbs.db

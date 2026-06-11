@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CINEMATCH — what should I watch or play?</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>🎬 CINEMATCH</h1>
+    <p class="tagline">Tell me how you feel. I'll pick your movie or game for tonight — and say why.</p>
+
+    <form id="form">
+      <textarea id="text" rows="3"
+        placeholder="e.g. something scary but short, watching with friends"></textarea>
+      <button id="go" type="submit">Find my match</button>
+    </form>
+
+    <p id="status" class="status" hidden></p>
+
+    <section id="result" class="result" hidden>
+      <h2 id="title"></h2>
+      <p id="meta" class="meta"></p>
+      <p id="why" class="why"></p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

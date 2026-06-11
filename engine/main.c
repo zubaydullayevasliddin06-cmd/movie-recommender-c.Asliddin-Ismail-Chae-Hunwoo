@@ -16,7 +16,16 @@ static int ask(const char *question, const char *opts[], int n) {
     return choice - 1;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+    /* Engine mode: the Node server calls this program as
+         cinematch <medium> <genre> <time> <mood> <social>
+       It prints ONE line of JSON and exits (no questions asked). */
+    if (argc == 6) {
+        recommendJson(argv[1], argv[2], argv[3], argv[4], argv[5]);
+        return 0;
+    }
+
+    /* Otherwise: the normal interactive console quiz. */
     printf("=================================================\n");
     printf("         CINEMATCH  -  Movie & Game AI\n");
     printf("   Stop scrolling. Start watching - or playing.\n");
