@@ -2,8 +2,11 @@
 .env
 server/.env
 
-# Node dependencies (re-created with "npm install")
+# Node dependencies (re-created with "pnpm install")
 node_modules/
+
+# Build output (re-created with "pnpm build")
+dist/
 
 # Compiled C output (re-created by compiling)
 *.exe

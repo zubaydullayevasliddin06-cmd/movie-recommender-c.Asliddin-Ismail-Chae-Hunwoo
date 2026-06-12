@@ -10,7 +10,9 @@ function createApp() {
   const app = express();
   app.use(express.json());
 
-  // Serve the simple fallback page (server/public). The Vite app in web/ is the main UI.
+  // Serve the built React app (web/dist) if it has been built; otherwise fall back to
+  // the simple page in server/public. (In development, use `vite dev` on :5173 instead.)
+  app.use(express.static(path.join(__dirname, '..', '..', '..', 'web', 'dist')));
   app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
   app.post('/api/recommend', async (req, res) => {

@@ -35,21 +35,21 @@
 - [x] `docs/GLOSSARY.md` — the ubiquitous language (Title, Preferences, Recommendation, …)
 
 ## Phase 3 — Vite + React front end (`web/`)
-- [ ] Scaffold a Vite + React app in `web/` with pnpm
-- [ ] `vite.config.js` proxy: `/api` → backend at `http://localhost:3000`
-- [ ] Build the UI: a mood text box, a button, and a result card (port the existing simple page to React)
-- [ ] Test the whole thing in the browser, end-to-end
+- [x] Scaffold a Vite + React app in `web/` with pnpm
+- [x] `vite.config.js` proxy: `/api` → backend at `http://localhost:3000`
+- [x] Build the UI: a mood text box, a button, and a result card (port the existing simple page to React)
+- [x] Test the whole thing in the browser, end-to-end — "relaxing cozy solo night" → Balatro (2024) ✅
 
 ## Phase 4 — Run config & demo
-- [ ] `.claude/launch.json` with two servers: `backend` (:3000) and `web` (:5173)
+- [x] `.claude/launch.json` with two servers: `backend` (:3000) and `web` (:5173)
 - [ ] Document the one-command run in `README.md` and `SETUP.md`
 - [ ] Rehearse the live demo and confirm it's reliable
 
-## Phase 5 — Git & GitHub (the AI does this for Asliddin)
-- [ ] Set git identity to Asliddin (needs his **GitHub email**)
-- [ ] Authenticate to GitHub (needs **Asliddin to log in once** — see SETUP.md)  ← blocker for pushing
-- [ ] Commit the work so far and push to `main`
-- [ ] Keep pushing at the end of each phase
+## Phase 5 — Git & GitHub (the AI does this for Asliddin)  ✅ working
+- [x] Set git identity to Asliddin
+- [x] Authenticate to GitHub (browser login via Git Credential Manager — works)
+- [x] First commit pushed to `main` (commit `114843d`)
+- [ ] Keep pushing at the end of each phase (ongoing)
 
 ## Phase 6 — Deliverables for the professor
 - [ ] Polished root `README.md` (what/why, how to run, architecture diagram)
