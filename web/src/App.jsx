@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import './App.css'
-import MoviesPage from './pages/MoviesPage'
-import GamesPage  from './pages/GamesPage'
-import AiPage     from './pages/AiPage'
+import MoviesPage     from './pages/MoviesPage'
+import GamesPage      from './pages/GamesPage'
+import AiPage         from './pages/AiPage'
+import DiscussionPage from './pages/DiscussionPage'
 
 const PAGES = [
-  { id: 'movies', label: '🎬 Movies' },
-  { id: 'games',  label: '🎮 Games'  },
-  { id: 'ai',     label: '✨ AI Match' },
+  { id: 'movies',     label: '🎬 Movies'     },
+  { id: 'games',      label: '🎮 Games'       },
+  { id: 'ai',         label: '✨ AI Match'    },
+  { id: 'discussion', label: '💬 Discussion'  },
 ]
 
 export default function App() {
@@ -15,7 +17,6 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Top navigation bar */}
       <header className="navbar">
         <div className="navbar-inner">
           <span className="logo">🎬 CINEMATCH</span>
@@ -33,11 +34,11 @@ export default function App() {
         </div>
       </header>
 
-      {/* Page content */}
       <main className="page-content">
-        {page === 'movies' && <MoviesPage />}
-        {page === 'games'  && <GamesPage  />}
-        {page === 'ai'     && <AiPage     />}
+        {page === 'movies'     && <MoviesPage     />}
+        {page === 'games'      && <GamesPage      />}
+        {page === 'ai'         && <AiPage         />}
+        {page === 'discussion' && <DiscussionPage />}
       </main>
     </div>
   )

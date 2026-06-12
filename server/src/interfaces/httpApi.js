@@ -5,6 +5,7 @@
 const express = require('express');
 const path = require('node:path');
 const { recommendForMood } = require('../application/recommendForMood');
+const { discussMovie }    = require('../application/discussMovie');
 const { TITLES } = require('../domain/library');
 
 function createApp() {
@@ -18,6 +19,18 @@ function createApp() {
 
   app.get('/api/titles', (_req, res) => {
     res.json(TITLES);
+  });
+
+  app.post('/api/discuss', async (req, res) => {
+    const { title, year, overview } = req.body || {};
+    if (!title) return res.status(400).json({ error: 'Movie title is required.' });
+    try {
+      const analysis = await discussMovie({ title, year: year || '', overview: overview || '' });
+      res.json(analysis);
+    } catch (err) {
+      console.error('Discuss failed:', err.message);
+      res.status(500).json({ error: err.message });
+    }
   });
 
   app.post('/api/recommend', async (req, res) => {
