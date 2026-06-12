@@ -1,0 +1,99 @@
+.library {
+  width: 100%;
+}
+
+.lib-title { margin: 0 0 4px; font-size: 1.6rem; }
+.lib-sub   { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; }
+
+.lib-search {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #333849;
+  background: #11141d;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+.lib-search:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+.lib-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.lib-chip {
+  width: auto;
+  margin-top: 0;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid #333849;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.lib-chip.small { padding: 5px 12px; font-size: 0.82rem; }
+.lib-chip:hover { border-color: var(--accent); color: var(--text); }
+.lib-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1300;
+  font-weight: 700;
+}
+
+.lib-count { margin: 6px 0 16px; color: var(--muted); font-size: 0.85rem; }
+
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.lib-card {
+  background: #11141d;
+  border: 1px solid #272b38;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.lib-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+.lib-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lib-emoji  { font-size: 1.3rem; }
+.lib-rating { font-size: 0.82rem; color: var(--accent); font-weight: 700; }
+
+.lib-name { margin: 0; font-size: 1rem; font-weight: 700; line-height: 1.3; }
+.lib-year { margin: 0; font-size: 0.8rem; color: var(--muted); }
+
+.lib-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+.lib-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #1e2130;
+  border: 1px solid #333849;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.lib-desc { margin: 4px 0 0; font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
+
+.lib-status { text-align: center; color: var(--muted); margin-top: 40px; }

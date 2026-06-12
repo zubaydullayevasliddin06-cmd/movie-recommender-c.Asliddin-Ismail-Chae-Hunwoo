@@ -1,6 +1,7 @@
 # Secrets — NEVER commit your API key
 .env
 server/.env
+web/.env.local
 
 # Node dependencies (re-created with "pnpm install")
 node_modules/

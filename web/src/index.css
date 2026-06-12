@@ -13,15 +13,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
   color: var(--text);
-  background: radial-gradient(1200px 600px at 50% -10%, #232838, var(--bg));
+  background: var(--bg);
 }
 
-#root {
-  width: 100%;
-  max-width: 560px;
-}
+#root { width: 100%; }

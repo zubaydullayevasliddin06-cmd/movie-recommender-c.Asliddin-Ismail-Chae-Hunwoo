@@ -1,0 +1,89 @@
+.ai-page { max-width: 640px; margin: 0 auto; }
+
+.ai-card {
+  background: #1a1d27;
+  border: 1px solid #272b38;
+  border-radius: 18px;
+  padding: 36px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.ai-title { margin: 0 0 6px; font-size: 1.8rem; }
+.ai-sub   { margin: 0 0 24px; color: var(--muted); line-height: 1.5; }
+
+.ai-input {
+  width: 100%;
+  resize: vertical;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #333849;
+  background: #11141d;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.ai-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+.ai-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #1a1300;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ai-btn:disabled { opacity: 0.6; cursor: progress; }
+
+.ai-status       { margin-top: 16px; color: var(--muted); }
+.ai-status.error { color: #ff8a8a; }
+
+.ai-result {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #11141d;
+  border: 1px solid #272b38;
+}
+.ai-result-header { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+.ai-icon          { font-size: 2rem; line-height: 1; }
+.ai-result-title  { margin: 0 0 4px; font-size: 1.3rem; }
+.ai-year          { color: var(--muted); font-weight: 400; }
+.ai-meta          { margin: 0; color: var(--accent); text-transform: capitalize; font-size: 0.9rem; }
+.ai-why           { margin: 0; line-height: 1.6; }
+
+/* How it works */
+.ai-how { margin-top: 32px; }
+.ai-how h3 { margin: 0 0 16px; color: var(--muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+.ai-steps {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ai-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1d27;
+  border: 1px solid #272b38;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+.ai-step span {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #1a1300;
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ai-arrow { color: var(--muted); font-size: 1.2rem; }

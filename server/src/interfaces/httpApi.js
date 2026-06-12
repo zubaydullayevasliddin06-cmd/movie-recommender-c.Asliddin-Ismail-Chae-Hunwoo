@@ -5,6 +5,7 @@
 const express = require('express');
 const path = require('node:path');
 const { recommendForMood } = require('../application/recommendForMood');
+const { TITLES } = require('../domain/library');
 
 function createApp() {
   const app = express();
@@ -14,6 +15,10 @@ function createApp() {
   // the simple page in server/public. (In development, use `vite dev` on :5173 instead.)
   app.use(express.static(path.join(__dirname, '..', '..', '..', 'web', 'dist')));
   app.use(express.static(path.join(__dirname, '..', '..', 'public')));
+
+  app.get('/api/titles', (_req, res) => {
+    res.json(TITLES);
+  });
 
   app.post('/api/recommend', async (req, res) => {
     const text = (req.body?.text || '').trim();
