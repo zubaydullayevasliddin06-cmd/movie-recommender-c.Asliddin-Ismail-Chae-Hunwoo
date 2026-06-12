@@ -42,8 +42,8 @@
 
 ## Phase 4 — Run config & demo
 - [x] `.claude/launch.json` with two servers: `backend` (:3000) and `web` (:5173)
-- [ ] Document the one-command run in `README.md` and `SETUP.md`
-- [ ] Rehearse the live demo and confirm it's reliable
+- [x] Document the one-command run in `README.md` and `SETUP.md`
+- [x] Rehearse the live demo and confirm it's reliable — 3/3 passed: Balatro, Alien, Super Mario Odyssey ✅
 
 ## Phase 5 — Git & GitHub (the AI does this for Asliddin)  ✅ working
 - [x] Set git identity to Asliddin
