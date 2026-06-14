@@ -51,12 +51,12 @@
 - [x] First commit pushed to `main` (commit `114843d`)
 - [ ] Keep pushing at the end of each phase (ongoing)
 
-## Phase 6 — Deliverables for the professor
-- [ ] Polished root `README.md` (what/why, how to run, architecture diagram)
-- [ ] `SETUP.md` — beginner step-by-step (install + run + get a key)
-- [ ] Written **report** (Word) generated from the docs
-- [ ] **Presentation slides** (PowerPoint)
-- [ ] Final demo rehearsal + checklist
+## Phase 6 — Deliverables for the professor  ✅ DONE
+- [x] Polished root `README.md` (what/why, how to run, architecture)
+- [x] `SETUP.md` — beginner step-by-step (install + run + get a key)
+- [x] Written **report** (Word) → `deliverables/CINEMATCH-Report.docx`
+- [x] **Presentation slides** (PowerPoint) → `deliverables/CINEMATCH-Presentation.pptx`
+- [x] Final demo rehearsal + checklist → `DEMO-CHECKLIST.md` (3/3 queries verified)
 
 ## Phase 7 — Stretch (only if time remains)
 - [ ] Tests (TDD) for the domain layer
