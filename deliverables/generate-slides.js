@@ -10,6 +10,9 @@ const AMBER2 = "E8922B";
 const TEXT   = "ECECF3";
 const MUTED  = "9AA0B4";
 const TEAL   = "5BC8AF";
+const CODE   = "DCDFE8";  // code text
+const COMMENT= "6FB39A";  // code comments (green)
+const KEY    = "FFCB7A";  // highlighted keyword
 
 const HFONT = "Georgia";   // header font with personality
 const BFONT = "Calibri";   // clean body
@@ -42,6 +45,37 @@ function footer(slide, n) {
 function card(slide, x, y, w, h, fill = CARD) {
   slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.08,
     fill: { color: fill }, line: { color: BORDER, width: 1 }, shadow: shadow() });
+}
+// A dark code panel. `lines` is an array of [text, kind] where kind is
+// 'c' (comment, green), 'k' (highlighted keyword line, amber), or '' (code).
+function codeBlock(slide, x, y, w, h, lines, fontSize = 11.5) {
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.06,
+    fill: { color: "0A0C12" }, line: { color: BORDER, width: 1 }, shadow: shadow() });
+  // little window dots
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.22, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "E0696A" } });
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.38, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "E8B14C" } });
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.54, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "6FB39A" } });
+  const runs = lines.map(([text, kind], i) => ({
+    text: text === "" ? " " : text,
+    options: {
+      breakLine: true,
+      fontFace: "Consolas",
+      fontSize,
+      color: kind === "c" ? COMMENT : kind === "k" ? KEY : CODE,
+      bold: kind === "k",
+    },
+  }));
+  slide.addText(runs, { x: x + 0.3, y: y + 0.45, w: w - 0.55, h: h - 0.65, margin: 0,
+    valign: "top", align: "left", lineSpacingMultiple: 1.02 });
+}
+// Right-hand "C techniques" panel listing language features used.
+function techPanel(slide, x, y, w, h, title, items) {
+  card(slide, x, y, w, h, CARD);
+  slide.addText(title, { x: x + 0.3, y: y + 0.25, w: w - 0.6, h: 0.4, margin: 0,
+    fontFace: BFONT, fontSize: 15, bold: true, color: AMBER });
+  const runs = items.map((t) => ({ text: t, options: { breakLine: true, bullet: { code: "2022", indent: 14 },
+    fontFace: BFONT, fontSize: 12.5, color: TEXT, paraSpaceAfter: 7 } }));
+  slide.addText(runs, { x: x + 0.3, y: y + 0.8, w: w - 0.55, h: h - 1.0, margin: 0, valign: "top" });
 }
 
 // ============================================================ 1. TITLE
@@ -250,7 +284,109 @@ s.addText("cinematch Movie horror short\n          intense group", { x: 8.65, y:
   fontFace: "Consolas", fontSize: 11.5, color: TEAL });
 footer(s, 7);
 
-// ============================================================ 8. FEATURES (2x2)
+// ============================================================ 8. C CODE — DATA STRUCTURES
+s = pres.addSlide();
+s.background = { color: BG };
+header(s, "Advanced C · Data", "Modeling the library with structs");
+codeBlock(s, M, 1.95, 7.5, 4.7, [
+  ["typedef struct {", "k"],
+  ["    const char *type;   /* Movie or Game */", ""],
+  ["    const char *title;", ""],
+  ["    int   year;", ""],
+  ["    const char *genre;", ""],
+  ["    const char *mood;", ""],
+  ["    const char *timeNeed;", ""],
+  ["    const char *social;", ""],
+  ["    const char *rating;", ""],
+  ["    const char *desc;", ""],
+  ["} Title;", "k"],
+  ["", ""],
+  ["/* The fixed library of 55 titles */", "c"],
+  ["Title library[] = {", "k"],
+  ['  {"Movie","Interstellar",2014,"scifi",', ""],
+  ['   "deep","medium","any","8.7", ... },', ""],
+  ["  /* ... 54 more titles ... */", "c"],
+  ["};", "k"],
+  ["int libSize =", ""],
+  ["    sizeof(library)/sizeof(library[0]);", ""],
+], 11);
+techPanel(s, 8.5, 1.95, W - M - 8.5, 4.7, "C techniques here", [
+  "typedef struct — a custom data type",
+  "Array of structs — the whole library",
+  "const char * — pointers to strings",
+  "sizeof trick — array length, computed at compile time",
+  "One source of truth: titles.h",
+]);
+footer(s, 8);
+
+// ============================================================ 9. C CODE — SCORING
+s = pres.addSlide();
+s.background = { color: BG };
+header(s, "Advanced C · Logic", "The scoring algorithm");
+codeBlock(s, M, 1.95, 7.5, 4.7, [
+  ["#define PTS_GENRE   6", "k"],
+  ["#define PTS_MOOD    4", "k"],
+  ["", ""],
+  ["/* How well one title fits the answers */", "c"],
+  ["static double scoreTitle(const Title *t,", ""],
+  ["        const char *genre,", ""],
+  ["        const char *mood, ...) {", ""],
+  ["    double score = 0.0;", ""],
+  ["    if (strcmp(t->genre, genre) == 0)", ""],
+  ["        score += PTS_GENRE;", ""],
+  ["    if (strcmp(t->mood, mood) == 0)", ""],
+  ["        score += PTS_MOOD;", ""],
+  ["    /* rating breaks ties: 8.7 -> +0.87 */", "c"],
+  ["    score += atof(t->rating) / 10.0;", ""],
+  ["    return score;", ""],
+  ["}", "k"],
+], 11.5);
+techPanel(s, 8.5, 1.95, W - M - 8.5, 4.7, "C techniques here", [
+  "static — file-private function (encapsulation)",
+  "const Title * — pointer to a read-only struct",
+  "strcmp() — string compare, <string.h>",
+  "atof() — text to double, <stdlib.h>",
+  "#define — compile-time constants",
+]);
+footer(s, 9);
+
+// ============================================================ 10. C CODE — THE BRIDGE
+s = pres.addSlide();
+s.background = { color: BG };
+header(s, "Advanced C · Systems", "One program, two modes — the C↔JS bridge");
+codeBlock(s, M, 1.95, 7.5, 3.9, [
+  ["int main(int argc, char **argv) {", "k"],
+  ["  /* Engine mode: Node runs the program as", "c"],
+  ["     cinematch <medium> <genre> <time>", "c"],
+  ["     <mood> <social>  */", "c"],
+  ["  if (argc == 6) {", ""],
+  ["    recommendJson(argv[1], argv[2],", ""],
+  ["                  argv[3], argv[4],", ""],
+  ["                  argv[5]);", ""],
+  ["    return 0;", ""],
+  ["  }", ""],
+  ["  /* else: ask 5 questions, then", "c"],
+  ["     recommend(...) prints to screen */", "c"],
+  ["}", "k"],
+], 11.5);
+techPanel(s, 8.5, 1.95, W - M - 8.5, 3.9, "C techniques here", [
+  "argc / argv — command-line arguments",
+  "Separate compilation — recommend.h interface",
+  "putchar / fputs — character output",
+  "Exit codes — return 0",
+]);
+// bottom strip — data crossing the bridge
+card(s, M, 6.05, W - 2 * M, 0.92, CARD2);
+s.addText([
+  { text: "C prints to stdout:  ", options: { color: MUTED } },
+  { text: '{"found":true,"title":"Get Out", ... }', options: { color: TEAL, fontFace: "Consolas" } },
+  { text: "   →   ", options: { color: AMBER, bold: true } },
+  { text: "Node.js:  ", options: { color: MUTED } },
+  { text: "JSON.parse(stdout)", options: { color: TEAL, fontFace: "Consolas" } },
+], { x: M + 0.3, y: 6.05, w: W - 2 * M - 0.6, h: 0.92, valign: "middle", margin: 0, fontFace: BFONT, fontSize: 13 });
+footer(s, 10);
+
+// ============================================================ 11. FEATURES (2x2)
 s = pres.addSlide();
 s.background = { color: BG };
 header(s, "The Product", "Four pages, one app");
@@ -271,9 +407,9 @@ for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) {
   s.addText(t, { x: fx + 1.7, y: fy + 0.4, w: fw - 2.0, h: 0.5, margin: 0, fontFace: HFONT, fontSize: 22, bold: true, color: AMBER });
   s.addText(d, { x: fx + 1.7, y: fy + 0.95, w: fw - 2.0, h: 0.95, margin: 0, fontFace: BFONT, fontSize: 13.5, color: TEXT, lineSpacingMultiple: 1.12 });
 }
-footer(s, 8);
+footer(s, 11);
 
-// ============================================================ 9. RELIABILITY
+// ============================================================ 12. RELIABILITY
 s = pres.addSlide();
 s.background = { color: BG };
 header(s, "Reliability", "Never crash in a live demo");
@@ -306,9 +442,9 @@ guards.forEach(([ic, t, d]) => {
   s.addText(d, { x: gx + 0.3, y: 5.25, w: gw - 0.6, h: 0.9, margin: 0, fontFace: BFONT, fontSize: 13, color: TEXT, lineSpacingMultiple: 1.1 });
   gx += gw + 0.5;
 });
-footer(s, 9);
+footer(s, 12);
 
-// ============================================================ 10. DEMO RESULTS
+// ============================================================ 13. DEMO RESULTS
 s = pres.addSlide();
 s.background = { color: BG };
 header(s, "Live Demo", "Rehearsed and reliable");
@@ -330,9 +466,9 @@ demos.forEach(([ic, q, title, meta]) => {
 });
 s.addText("Same mood → same pick, every time. The C engine is deterministic.",
   { x: M, y: 6.2, w: W - 2*M, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 13, italic: true, color: MUTED });
-footer(s, 10);
+footer(s, 13);
 
-// ============================================================ 11. TECH STACK
+// ============================================================ 14. TECH STACK
 s = pres.addSlide();
 s.background = { color: BG };
 header(s, "Under the Hood", "Tech stack & open data");
@@ -356,9 +492,9 @@ for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) {
   s.addText(t.toUpperCase(), { x: tx + 0.2, y: ty + 0.35, w: tcw - 0.4, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 11, bold: true, color: MUTED, charSpacing: 1 });
   s.addText(d, { x: tx + 0.2, y: ty + 0.8, w: tcw - 0.4, h: 0.7, margin: 0, fontFace: BFONT, fontSize: 15, bold: true, color: TEXT });
 }
-footer(s, 11);
+footer(s, 14);
 
-// ============================================================ 12. CLOSING
+// ============================================================ 15. CLOSING
 s = pres.addSlide();
 s.background = { color: BG };
 s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.12, fill: { color: AMBER } });
