@@ -3,7 +3,7 @@ const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, LevelFormat, TableOfContents, HeadingLevel,
   BorderStyle, WidthType, ShadingType, PageBreak, PageNumber,
-  Header, Footer, ExternalHyperlink,
+  Header, Footer, ExternalHyperlink, TabStopType, LeaderType,
 } = require("docx");
 
 // ---------- helpers ----------
@@ -72,6 +72,23 @@ function table(widths, rows) {
   });
 }
 function spacer() { return new Paragraph({ children: [new TextRun("")] }); }
+function appNum(text) {
+  return new Paragraph({
+    numbering: { reference: "appendixSteps", level: 0 },
+    spacing: { after: 70, line: 264 },
+    children: [new TextRun(text)],
+  });
+}
+function tocLine(label, page, { bold = false } = {}) {
+  return new Paragraph({
+    spacing: { after: 90, line: 264 },
+    tabStops: [{ type: TabStopType.RIGHT, position: 9360, leader: LeaderType.DOT }],
+    children: [
+      new TextRun({ text: label, bold, color: bold ? DARK : "222222" }),
+      new TextRun({ text: "\t" + page, bold }),
+    ],
+  });
+}
 
 // ---------- document ----------
 const doc = new Document({
@@ -94,6 +111,8 @@ const doc = new Document({
       { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•",
         alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 520, hanging: 260 } } } }] },
       { reference: "steps", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.",
+        alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 520, hanging: 260 } } } }] },
+      { reference: "appendixSteps", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.",
         alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 520, hanging: 260 } } } }] },
     ],
   },
@@ -142,9 +161,24 @@ const doc = new Document({
         })] }),
       },
       children: [
-        // TOC
+        // TOC (static — always renders, no field update needed)
         new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Table of Contents")] }),
-        new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-2" }),
+        spacer(),
+        tocLine("1.  Executive Summary", "3", { bold: true }),
+        tocLine("2.  Problem and Motivation", "3", { bold: true }),
+        tocLine("3.  Project Goals and Scope", "3", { bold: true }),
+        tocLine("4.  System Architecture", "4", { bold: true }),
+        tocLine("5.  How AI / the LLM Is Used", "5", { bold: true }),
+        tocLine("6.  The C Recommendation Engine", "5", { bold: true }),
+        tocLine("7.  Application Features", "6", { bold: true }),
+        tocLine("8.  Technology Stack and Data Sources", "6", { bold: true }),
+        tocLine("9.  Reliability and Resilience", "7", { bold: true }),
+        tocLine("10.  Engineering Process", "7", { bold: true }),
+        tocLine("11.  Challenges and Solutions", "7", { bold: true }),
+        tocLine("12.  Results", "8", { bold: true }),
+        tocLine("13.  Future Work", "8", { bold: true }),
+        tocLine("14.  Conclusion", "8", { bold: true }),
+        tocLine("Appendix A — How to Run", "9", { bold: true }),
         new Paragraph({ children: [new PageBreak()] }),
 
         // 1. Executive Summary
@@ -315,9 +349,9 @@ const doc = new Document({
         new Paragraph({ children: [new PageBreak()] }),
         h1("Appendix A — How to Run"),
         p("Prerequisites: Node.js, pnpm, and (to recompile the engine) a C compiler such as GCC. Two free API keys are needed for the Movies and Games pages (TMDB and RAWG), stored in web/.env.local; the AI key lives in server/.env."),
-        num("Start the backend:  cd server  then  node server.js  (runs on port 3000)."),
-        num("Start the frontend:  cd web  then  pnpm dev  (runs on port 5173)."),
-        num("Open http://localhost:5173 in a browser."),
+        appNum("Start the backend:  cd server  then  node server.js  (runs on port 3000)."),
+        appNum("Start the frontend:  cd web  then  pnpm dev  (runs on port 5173)."),
+        appNum("Open http://localhost:5173 in a browser."),
         spacer(),
         new Paragraph({ children: [
           new TextRun("Source code: "),

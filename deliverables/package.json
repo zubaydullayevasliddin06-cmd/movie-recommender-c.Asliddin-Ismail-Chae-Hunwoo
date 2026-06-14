@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "docx": "^9.7.1",
+    "pdf-poppler": "^0.2.3",
     "pptxgenjs": "^4.0.1"
   }
 }

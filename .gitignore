@@ -13,6 +13,9 @@ dist/
 *.exe
 *.o
 
+# Deliverables: QA render artifacts (regeneratable from the .js generators)
+deliverables/qa/
+
 # OS junk
 .DS_Store
 Thumbs.db
