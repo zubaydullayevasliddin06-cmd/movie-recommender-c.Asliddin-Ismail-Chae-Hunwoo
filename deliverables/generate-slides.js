@@ -1,580 +1,929 @@
+/* generate-slides.js  —  CINEMATCH Presentation  (6 members, 17 slides, 15 min)
+   Run: node generate-slides.js   (from inside deliverables/) */
+
 const pptxgen = require("pptxgenjs");
 
-// ---------- palette (cinema dark — matches the CINEMATCH app) ----------
-const BG     = "0F1117";  // app background
-const CARD   = "1A1D27";  // app card
-const CARD2  = "11141D";  // inset
+// ── Palette ──────────────────────────────────────────────────────────
+const BG     = "0F1117";
+const CARD   = "1A1D27";
+const CARD2  = "11141D";
 const BORDER = "2A2F3E";
-const AMBER  = "FFB347";  // app accent
-const AMBER2 = "E8922B";
+const AMBER  = "FFB347";
 const TEXT   = "ECECF3";
 const MUTED  = "9AA0B4";
 const TEAL   = "5BC8AF";
-const CODE   = "DCDFE8";  // code text
-const COMMENT= "6FB39A";  // code comments (green)
-const KEY    = "FFCB7A";  // highlighted keyword
+const GREEN  = "6FB39A";
+const CODE   = "DCDFE8";
+const KEY    = "FFCB7A";
+const RED    = "E0696A";
 
-const HFONT = "Georgia";   // header font with personality
-const BFONT = "Calibri";   // clean body
+const HFONT  = "Georgia";
+const BFONT  = "Calibri";
 
-const pres = new pptxgen();
-pres.layout = "LAYOUT_WIDE"; // 13.3 x 7.5
-pres.author = "CINEMATCH Team";
-pres.title  = "CINEMATCH — Capstone Presentation";
+const pres   = new pptxgen();
+pres.layout  = "LAYOUT_WIDE";   // 13.3 × 7.5
+pres.author  = "CINEMATCH Team";
+pres.title   = "CINEMATCH — Capstone Presentation";
 
 const W = 13.3, H = 7.5, M = 0.7;
 
-function shadow() { return { type: "outer", color: "000000", blur: 8, offset: 3, angle: 135, opacity: 0.35 }; }
-
-// section header used on content slides
-function header(slide, kicker, title) {
-  slide.addShape(pres.shapes.OVAL, { x: M, y: 0.62, w: 0.16, h: 0.16, fill: { color: AMBER } });
-  slide.addText(kicker.toUpperCase(), { x: M + 0.28, y: 0.5, w: 10, h: 0.4, margin: 0,
-    fontFace: BFONT, fontSize: 12, color: AMBER, bold: true, charSpacing: 3 });
-  slide.addText(title, { x: M, y: 0.85, w: W - 2 * M, h: 0.8, margin: 0,
-    fontFace: HFONT, fontSize: 32, color: TEXT, bold: true });
-}
-function footer(slide, n) {
-  slide.addText([
-    { text: "CINEMATCH", options: { color: AMBER, bold: true } },
-    { text: "   ·   AI-Powered Movie & Game Recommender", options: { color: MUTED } },
-  ], { x: M, y: H - 0.5, w: 9, h: 0.3, margin: 0, fontFace: BFONT, fontSize: 9 });
-  slide.addText(String(n), { x: W - 1.2, y: H - 0.5, w: 0.5, h: 0.3, margin: 0,
-    align: "right", fontFace: BFONT, fontSize: 9, color: MUTED });
+// ── Reusable helpers ─────────────────────────────────────────────────
+function shadow() {
+  return { type:"outer", color:"000000", blur:8, offset:3, angle:135, opacity:0.35 };
 }
 function card(slide, x, y, w, h, fill = CARD) {
-  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.08,
-    fill: { color: fill }, line: { color: BORDER, width: 1 }, shadow: shadow() });
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius:0.08,
+    fill:{color:fill}, line:{color:BORDER,width:1}, shadow:shadow() });
 }
-// A dark code panel. `lines` is an array of [text, kind] where kind is
-// 'c' (comment, green), 'k' (highlighted keyword line, amber), or '' (code).
-function codeBlock(slide, x, y, w, h, lines, fontSize = 11.5) {
-  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.06,
-    fill: { color: "0A0C12" }, line: { color: BORDER, width: 1 }, shadow: shadow() });
-  // little window dots
-  slide.addShape(pres.shapes.OVAL, { x: x + 0.22, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "E0696A" } });
-  slide.addShape(pres.shapes.OVAL, { x: x + 0.38, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "E8B14C" } });
-  slide.addShape(pres.shapes.OVAL, { x: x + 0.54, y: y + 0.18, w: 0.1, h: 0.1, fill: { color: "6FB39A" } });
-  const runs = lines.map(([text, kind], i) => ({
-    text: text === "" ? " " : text,
-    options: {
-      breakLine: true,
-      fontFace: "Consolas",
-      fontSize,
-      color: kind === "c" ? COMMENT : kind === "k" ? KEY : CODE,
-      bold: kind === "k",
-    },
+function header(slide, kicker, title) {
+  slide.addShape(pres.shapes.OVAL, { x:M, y:0.62, w:0.16, h:0.16, fill:{color:AMBER} });
+  slide.addText(kicker.toUpperCase(), { x:M+0.28, y:0.5, w:10, h:0.4, margin:0,
+    fontFace:BFONT, fontSize:12, color:AMBER, bold:true, charSpacing:3 });
+  slide.addText(title, { x:M, y:0.85, w:W-2*M, h:0.8, margin:0,
+    fontFace:HFONT, fontSize:32, color:TEXT, bold:true });
+}
+function footer(slide, n, member) {
+  slide.addText([
+    { text:"CINEMATCH", options:{color:AMBER,bold:true} },
+    { text:"   ·   AI-Powered Movie & Game Recommender", options:{color:MUTED} },
+  ], { x:M, y:H-0.5, w:9, h:0.3, margin:0, fontFace:BFONT, fontSize:9 });
+  if (member) {
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x:W-2.8, y:H-0.55, w:1.4, h:0.28,
+      rectRadius:0.06, fill:{color:CARD}, line:{color:BORDER,width:1} });
+    slide.addText(`Member ${member}`, { x:W-2.8, y:H-0.55, w:1.4, h:0.28, margin:0,
+      align:"center", fontFace:BFONT, fontSize:9, color:AMBER, bold:true });
+  }
+  slide.addText(String(n), { x:W-1.0, y:H-0.5, w:0.4, h:0.3, margin:0,
+    align:"right", fontFace:BFONT, fontSize:9, color:MUTED });
+}
+function codeBlock(slide, x, y, w, h, lines, fontSize=11) {
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius:0.06,
+    fill:{color:"0A0C12"}, line:{color:BORDER,width:1}, shadow:shadow() });
+  slide.addShape(pres.shapes.OVAL, { x:x+0.22, y:y+0.18, w:0.1, h:0.1, fill:{color:RED} });
+  slide.addShape(pres.shapes.OVAL, { x:x+0.38, y:y+0.18, w:0.1, h:0.1, fill:{color:"E8B14C"} });
+  slide.addShape(pres.shapes.OVAL, { x:x+0.54, y:y+0.18, w:0.1, h:0.1, fill:{color:GREEN} });
+  const runs = lines.map(([text,kind]) => ({
+    text: text===""?" ":text,
+    options:{ breakLine:true, fontFace:"Consolas", fontSize,
+      color: kind==="c"?GREEN : kind==="k"?KEY : CODE, bold:kind==="k" },
   }));
-  slide.addText(runs, { x: x + 0.3, y: y + 0.45, w: w - 0.55, h: h - 0.65, margin: 0,
-    valign: "top", align: "left", lineSpacingMultiple: 1.02 });
+  slide.addText(runs, { x:x+0.3, y:y+0.45, w:w-0.55, h:h-0.65,
+    margin:0, valign:"top", align:"left", lineSpacingMultiple:1.05 });
 }
-// Right-hand "C techniques" panel listing language features used.
-function techPanel(slide, x, y, w, h, title, items) {
-  card(slide, x, y, w, h, CARD);
-  slide.addText(title, { x: x + 0.3, y: y + 0.25, w: w - 0.6, h: 0.4, margin: 0,
-    fontFace: BFONT, fontSize: 15, bold: true, color: AMBER });
-  const runs = items.map((t) => ({ text: t, options: { breakLine: true, bullet: { code: "2022", indent: 14 },
-    fontFace: BFONT, fontSize: 12.5, color: TEXT, paraSpaceAfter: 7 } }));
-  slide.addText(runs, { x: x + 0.3, y: y + 0.8, w: w - 0.55, h: h - 1.0, margin: 0, valign: "top" });
+function memberTag(slide, n, color = AMBER) {
+  const labels = {1:"Introduction",2:"Features",3:"C Engine",4:"AI & APIs",5:"Backend",6:"Conclusion"};
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x:W-2.8, y:0.42, w:2.1, h:0.32,
+    rectRadius:0.06, fill:{color:CARD}, line:{color:color,width:2} });
+  slide.addText(`◀  Member ${n}  ·  ${labels[n]}`, { x:W-2.8, y:0.42, w:2.1, h:0.32,
+    margin:0, align:"center", fontFace:BFONT, fontSize:9.5, color:color, bold:true });
+}
+function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
+  const runs = items.map(t => ({
+    text: "  "+t,
+    options:{ breakLine:true, fontFace:BFONT, fontSize, color:TEXT,
+      paraSpaceAfter:8, bullet:{code:"25CF",indent:14,color} },
+  }));
+  slide.addText(runs, { x, y, w:W-x-M, h:3.5, margin:0, valign:"top" });
 }
 
-// ============================================================ 1. TITLE
-let s = pres.addSlide();
-s.background = { color: BG };
-// faint amber glow band
-s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.12, fill: { color: AMBER } });
-s.addText("🎬", { x: 0, y: 1.5, w: W, h: 1.4, align: "center", fontSize: 80, margin: 0 });
-s.addText("CINEMATCH", { x: 0, y: 2.9, w: W, h: 1.2, align: "center", margin: 0,
-  fontFace: HFONT, fontSize: 66, bold: true, color: AMBER, charSpacing: 2 });
-s.addText("An AI-Powered Movie & Game Recommender", { x: 0, y: 4.1, w: W, h: 0.5, align: "center",
-  margin: 0, fontFace: BFONT, fontSize: 22, color: TEXT });
-s.addText("Describe your mood — get the perfect pick, and the reason why.", { x: 0, y: 4.6, w: W, h: 0.4,
-  align: "center", margin: 0, fontFace: BFONT, fontSize: 14, italic: true, color: MUTED });
-s.addShape(pres.shapes.LINE, { x: W/2 - 1.5, y: 5.45, w: 3, h: 0, line: { color: BORDER, width: 1 } });
-s.addText("Software Engineering Capstone  ·  Sejong University", { x: 0, y: 5.6, w: W, h: 0.4,
-  align: "center", margin: 0, fontFace: BFONT, fontSize: 13, color: MUTED });
-s.addText("Asliddin Ismail   ·   Chae Hunwoo", { x: 0, y: 6.0, w: W, h: 0.4,
-  align: "center", margin: 0, fontFace: BFONT, fontSize: 14, color: TEXT, bold: true });
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 1  —  Title  (Member 1)
+// ════════════════════════════════════════════════════════════════════════
+(function slide1() {
+  const s = pres.addSlide(); s.background = {color:BG};
 
-// ============================================================ 2. PROBLEM
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "The Problem", "Too much choice, too little time");
-// left: big stat callout
-card(s, M, 1.95, 5.4, 4.5);
-s.addText("“", { x: M + 0.2, y: 2.0, w: 1, h: 1, margin: 0, fontFace: HFONT, fontSize: 80, color: AMBER });
-s.addText([
-  { text: "People often spend ", options: { color: TEXT } },
-  { text: "longer choosing", options: { color: AMBER, bold: true } },
-  { text: " what to watch than they spend enjoying a short film.", options: { color: TEXT } },
-], { x: M + 0.4, y: 3.0, w: 4.6, h: 2.0, margin: 0, fontFace: HFONT, fontSize: 24, italic: true, lineSpacingMultiple: 1.1 });
-s.addText("Decision fatigue is real.", { x: M + 0.4, y: 5.5, w: 4.6, h: 0.5, margin: 0,
-  fontFace: BFONT, fontSize: 14, color: MUTED });
-// right: pain points
-const pains = [
-  ["⏳", "Endless scrolling", "Streaming menus offer hundreds of rows and no clear answer."],
-  ["🔁", "Optimized for engagement", "Platforms maximise watch-time, not a confident decision."],
-  ["🤷", "No reason given", "Recommendations rarely explain why a title suits you."],
-];
-let py = 1.95;
-pains.forEach(([ic, t, d]) => {
-  card(s, 6.6, py, 6.0, 1.42);
-  s.addText(ic, { x: 6.8, y: py + 0.32, w: 0.8, h: 0.8, margin: 0, fontSize: 26, align: "center" });
-  s.addText(t, { x: 7.7, y: py + 0.22, w: 4.7, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 16, bold: true, color: TEXT });
-  s.addText(d, { x: 7.7, y: py + 0.62, w: 4.7, h: 0.7, margin: 0, fontFace: BFONT, fontSize: 12, color: MUTED });
-  py += 1.55;
-});
-footer(s, 2);
+  // Big amber title
+  s.addText("CINEMATCH", { x:M, y:1.5, w:W-2*M, h:1.6, margin:0,
+    align:"center", fontFace:HFONT, fontSize:80, color:AMBER, bold:true, shadow:shadow() });
 
-// ============================================================ 3. SOLUTION
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Our Solution", "One answer. And the reason why.");
-card(s, M, 2.0, W - 2*M, 2.2, CARD);
-s.addText([
-  { text: "CINEMATCH ", options: { color: AMBER, bold: true } },
-  { text: "is a web app where you describe your mood in plain words — and an ", options: { color: TEXT } },
-  { text: "AI", options: { color: TEAL, bold: true } },
-  { text: " plus a ", options: { color: TEXT } },
-  { text: "C engine", options: { color: TEAL, bold: true } },
-  { text: " instantly pick the perfect movie or game for tonight, and tell you why.", options: { color: TEXT } },
-], { x: M + 0.5, y: 2.35, w: W - 2*M - 1.0, h: 1.5, margin: 0, fontFace: HFONT, fontSize: 26, lineSpacingMultiple: 1.15 });
-// three contrast pills
-const pills = [
-  ["Opinionated", "One confident pick — not 20 rows of thumbnails."],
-  ["Explained", "A warm, plain-language reason you can trust."],
-  ["Hybrid", "AI for language, C for deterministic logic."],
-];
-let px = M;
-const pw = (W - 2*M - 1.0) / 3;
-pills.forEach(([t, d]) => {
-  card(s, px, 4.6, pw, 1.9, CARD2);
-  s.addShape(pres.shapes.RECTANGLE, { x: px, y: 4.6, w: 0.09, h: 1.9, fill: { color: AMBER } });
-  s.addText(t, { x: px + 0.35, y: 4.85, w: pw - 0.6, h: 0.5, margin: 0, fontFace: BFONT, fontSize: 19, bold: true, color: AMBER });
-  s.addText(d, { x: px + 0.35, y: 5.4, w: pw - 0.6, h: 1.0, margin: 0, fontFace: BFONT, fontSize: 13.5, color: TEXT, lineSpacingMultiple: 1.1 });
-  px += pw + 0.5;
-});
-footer(s, 3);
+  // Tagline
+  s.addText("AI + C Engine  ·  Mood-Based Movie & Game Recommender",
+    { x:M, y:3.15, w:W-2*M, h:0.5, margin:0, align:"center",
+      fontFace:BFONT, fontSize:20, color:TEXT });
 
-// ============================================================ 4. HOW IT WORKS (pipeline)
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "How It Works", "The five-step pipeline");
-const steps = [
-  ["1", "You type a mood", "“scary but short, with friends”", TEXT],
-  ["2", "AI → preferences", "medium · genre · time · mood · social", TEAL],
-  ["3", "C engine scores", "all 55 titles, picks the best", AMBER],
-  ["4", "AI explains", "a warm, personal reason", TEAL],
-  ["5", "Shown in browser", "one confident result", TEXT],
-];
-const cw = (W - 2*M - 4*0.35) / 5;
-let cx = M;
-steps.forEach(([nbox, t, d], i) => {
-  const yc = 2.4;
-  card(s, cx, yc, cw, 2.6);
-  s.addShape(pres.shapes.OVAL, { x: cx + cw/2 - 0.35, y: yc + 0.3, w: 0.7, h: 0.7, fill: { color: AMBER } });
-  s.addText(nbox, { x: cx + cw/2 - 0.35, y: yc + 0.3, w: 0.7, h: 0.7, align: "center", valign: "middle",
-    margin: 0, fontFace: HFONT, fontSize: 26, bold: true, color: BG });
-  s.addText(t, { x: cx + 0.1, y: yc + 1.15, w: cw - 0.2, h: 0.6, align: "center", margin: 0,
-    fontFace: BFONT, fontSize: 14.5, bold: true, color: TEXT });
-  s.addText(d, { x: cx + 0.1, y: yc + 1.75, w: cw - 0.2, h: 0.75, align: "center", margin: 0,
-    fontFace: BFONT, fontSize: 11, color: MUTED, lineSpacingMultiple: 1.05 });
-  // arrow
-  if (i < 4) s.addText("›", { x: cx + cw - 0.02, y: yc + 0.9, w: 0.4, h: 0.5, align: "center", margin: 0,
-    fontFace: BFONT, fontSize: 30, color: AMBER, bold: true });
-  cx += cw + 0.35;
-});
-s.addText([
-  { text: "AI handles language", options: { color: TEAL, bold: true } },
-  { text: "   ·   ", options: { color: MUTED } },
-  { text: "C handles deterministic logic", options: { color: AMBER, bold: true } },
-], { x: M, y: 5.5, w: W - 2*M, h: 0.5, align: "center", margin: 0, fontFace: BFONT, fontSize: 15 });
-footer(s, 4);
+  // Divider
+  s.addShape(pres.shapes.RECTANGLE, { x:3.5, y:3.75, w:6.3, h:0.04, fill:{color:AMBER} });
 
-// ============================================================ 5. ARCHITECTURE (DDD)
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Architecture", "Domain-Driven Design");
-s.addText("Separate the business idea from the plumbing — each layer has one job.",
-  { x: M, y: 1.7, w: W - 2*M, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 14, color: MUTED });
-const layers = [
-  ["Interfaces", "What users reach: web pages + HTTP API", "Vite + React · Express"],
-  ["Application", "Use cases: understand → pick → explain → discuss", "Node.js"],
-  ["Domain", "Core concepts & rules · the scoring", "Node.js + C engine"],
-  ["Infrastructure", "The outside world: AI client, engine runner", "OpenRouter · child process"],
-];
-let ly = 2.25;
-layers.forEach(([t, d, tech], i) => {
-  card(s, M, ly, W - 2*M, 0.92, i === 2 ? CARD : CARD2);
-  s.addShape(pres.shapes.RECTANGLE, { x: M, y: ly, w: 0.12, h: 0.92, fill: { color: i === 2 ? AMBER : TEAL } });
-  s.addText(t, { x: M + 0.4, y: ly + 0.12, w: 3.0, h: 0.68, valign: "middle", margin: 0,
-    fontFace: BFONT, fontSize: 19, bold: true, color: i === 2 ? AMBER : TEXT });
-  s.addText(d, { x: M + 3.5, y: ly + 0.12, w: 5.6, h: 0.68, valign: "middle", margin: 0,
-    fontFace: BFONT, fontSize: 13.5, color: TEXT });
-  s.addText(tech, { x: W - M - 3.4, y: ly + 0.12, w: 3.2, h: 0.68, valign: "middle", align: "right", margin: 0,
-    fontFace: "Consolas", fontSize: 12, color: MUTED });
-  ly += 1.02;
-});
-s.addText("The Node backend runs the compiled C program as a child process, exchanging JSON.",
-  { x: M, y: 6.5, w: W - 2*M, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 12, italic: true, color: MUTED });
-footer(s, 5);
+  // Course info
+  s.addText("Advanced C Programming  ·  Sejong University  ·  2024",
+    { x:M, y:3.95, w:W-2*M, h:0.4, margin:0, align:"center",
+      fontFace:BFONT, fontSize:14, color:MUTED });
 
-// ============================================================ 6. AI USAGE
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "The AI", "An LLM at three points");
-const ai = [
-  ["🧠", "Mood understanding", "Reads free text and emits structured preferences as strict JSON — turning vague human language into machine-usable data."],
-  ["💬", "Explanation generation", "After the C engine picks a title, the LLM writes a warm two-to-three sentence reason, tailored to what the user said."],
-  ["🎭", "Movie discussion", "Generates a full analysis of any film: theme, epic moments, director's vision, and discussion questions."],
-];
-let ax = M;
-const aw = (W - 2*M - 2*0.5) / 3;
-ai.forEach(([ic, t, d]) => {
-  card(s, ax, 2.1, aw, 3.4);
-  s.addShape(pres.shapes.OVAL, { x: ax + 0.4, y: 2.45, w: 0.95, h: 0.95, fill: { color: CARD2 }, line: { color: AMBER, width: 1.5 } });
-  s.addText(ic, { x: ax + 0.4, y: 2.45, w: 0.95, h: 0.95, align: "center", valign: "middle", margin: 0, fontSize: 30 });
-  s.addText(t, { x: ax + 0.4, y: 3.6, w: aw - 0.8, h: 0.5, margin: 0, fontFace: BFONT, fontSize: 18, bold: true, color: AMBER });
-  s.addText(d, { x: ax + 0.4, y: 4.15, w: aw - 0.8, h: 1.2, margin: 0, fontFace: BFONT, fontSize: 13, color: TEXT, lineSpacingMultiple: 1.12 });
-  ax += aw + 0.5;
-});
-s.addText([
-  { text: "Provider:  ", options: { color: MUTED } },
-  { text: "OpenRouter — free open models (Qwen3)", options: { color: TEAL, bold: true } },
-  { text: "   ·   zero cost for students", options: { color: MUTED } },
-], { x: M, y: 5.85, w: W - 2*M, h: 0.5, align: "center", margin: 0, fontFace: BFONT, fontSize: 14 });
-footer(s, 6);
+  // Team columns
+  const members = [
+    ["Member 1","[Name]"], ["Member 2","[Name]"], ["Member 3","[Name]"],
+    ["Member 4","[Name]"], ["Member 5","[Name]"], ["Member 6","[Name]"],
+  ];
+  const cols = [[members[0],members[1],members[2]], [members[3],members[4],members[5]]];
+  cols.forEach((col, ci) => {
+    col.forEach(([role,name], ri) => {
+      const x = 3.5 + ci * 3.3, y = 4.55 + ri * 0.38;
+      s.addText(role + "  ", { x, y, w:1.3, h:0.34, margin:0,
+        fontFace:BFONT, fontSize:12, color:AMBER, bold:true, align:"right" });
+      s.addText(name, { x:x+1.35, y, w:1.9, h:0.34, margin:0,
+        fontFace:BFONT, fontSize:12, color:TEXT });
+    });
+  });
 
-// ============================================================ 7. C ENGINE (chart)
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "The C Engine", "Transparent, rule-based scoring");
-s.addText("Each title earns points; the highest score wins. The biggest weights reflect what matters most.",
-  { x: M, y: 1.7, w: W - 2*M, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 14, color: MUTED });
-s.addChart(pres.charts.BAR, [{
-  name: "Points", labels: ["Genre", "Medium", "Mood", "Time", "Social"], values: [6, 5, 4, 3, 2],
-}], {
-  x: M, y: 2.3, w: 7.2, h: 4.3, barDir: "col",
-  chartColors: [AMBER, AMBER, AMBER2, AMBER2, AMBER2],
-  chartArea: { fill: { color: CARD } },
-  plotArea: { fill: { color: CARD } },
-  catAxisLabelColor: MUTED, valAxisLabelColor: MUTED,
-  catAxisLabelFontFace: BFONT, valAxisLabelFontFace: BFONT,
-  catAxisLabelFontSize: 13, valAxisLabelFontSize: 11,
-  valGridLine: { color: BORDER, size: 0.5 }, catGridLine: { style: "none" },
-  valAxisHidden: false, showValue: true, dataLabelPosition: "outEnd",
-  dataLabelColor: TEXT, dataLabelFontFace: BFONT, dataLabelFontSize: 14, dataLabelFontBold: true,
-  showLegend: false, showTitle: false, valAxisMaxVal: 7, valAxisMinVal: 0,
-  barGapWidthPct: 60,
-});
-// engine mode card
-card(s, 8.2, 2.3, W - M - 8.2, 4.3, CARD);
-s.addText("Engine Mode", { x: 8.5, y: 2.55, w: 4, h: 0.5, margin: 0, fontFace: BFONT, fontSize: 18, bold: true, color: AMBER });
-s.addText("One C program, two modes:", { x: 8.5, y: 3.1, w: 4.2, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 13, color: MUTED });
-s.addText([
-  { text: "No args", options: { bold: true, color: TEXT, breakLine: true } },
-  { text: "→ interactive 5-question quiz", options: { color: MUTED, breakLine: true } },
-], { x: 8.5, y: 3.55, w: 4.3, h: 0.9, margin: 0, fontFace: BFONT, fontSize: 13, lineSpacingMultiple: 1.1 });
-s.addText([
-  { text: "5 args", options: { bold: true, color: TEXT, breakLine: true } },
-  { text: "→ prints one line of JSON", options: { color: MUTED } },
-], { x: 8.5, y: 4.45, w: 4.3, h: 0.9, margin: 0, fontFace: BFONT, fontSize: 13, lineSpacingMultiple: 1.1 });
-s.addShape(pres.shapes.RECTANGLE, { x: 8.5, y: 5.45, w: W - M - 8.7, h: 0.9, fill: { color: CARD2 }, line: { color: BORDER, width: 1 } });
-s.addText("cinematch Movie horror short\n          intense group", { x: 8.65, y: 5.55, w: 4.2, h: 0.75, margin: 0,
-  fontFace: "Consolas", fontSize: 11.5, color: TEAL });
-footer(s, 7);
+  footer(s, 1, null);
+})();
 
-// ============================================================ 8. C CODE — DATA STRUCTURES
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Advanced C · Data", "Modeling the library with structs");
-codeBlock(s, M, 1.95, 7.5, 4.7, [
-  ["typedef struct {", "k"],
-  ["    const char *type;   /* Movie or Game */", ""],
-  ["    const char *title;", ""],
-  ["    int   year;", ""],
-  ["    const char *genre;", ""],
-  ["    const char *mood;", ""],
-  ["    const char *timeNeed;", ""],
-  ["    const char *social;", ""],
-  ["    const char *rating;", ""],
-  ["    const char *desc;", ""],
-  ["} Title;", "k"],
-  ["", ""],
-  ["/* The fixed library of 55 titles */", "c"],
-  ["Title library[] = {", "k"],
-  ['  {"Movie","Interstellar",2014,"scifi",', ""],
-  ['   "deep","medium","any","8.7", ... },', ""],
-  ["  /* ... 54 more titles ... */", "c"],
-  ["};", "k"],
-  ["int libSize =", ""],
-  ["    sizeof(library)/sizeof(library[0]);", ""],
-], 11);
-techPanel(s, 8.5, 1.95, W - M - 8.5, 4.7, "C techniques here", [
-  "typedef struct — a custom data type",
-  "Array of structs — the whole library",
-  "const char * — pointers to strings",
-  "sizeof trick — array length, computed at compile time",
-  "One source of truth: titles.h",
-]);
-footer(s, 8);
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 2  —  The Problem  (Member 1)
+// ════════════════════════════════════════════════════════════════════════
+(function slide2() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 1  ·  Introduction", "The Problem");
+  memberTag(s, 1);
 
-// ============================================================ 9. C CODE — SCORING
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Advanced C · Logic", "The scoring algorithm");
-codeBlock(s, M, 1.95, 7.5, 4.7, [
-  ["#define PTS_GENRE   6", "k"],
-  ["#define PTS_MOOD    4", "k"],
-  ["", ""],
-  ["/* How well one title fits the answers */", "c"],
-  ["static double scoreTitle(const Title *t,", ""],
-  ["        const char *genre,", ""],
-  ["        const char *mood, ...) {", ""],
-  ["    double score = 0.0;", ""],
-  ["    if (strcmp(t->genre, genre) == 0)", ""],
-  ["        score += PTS_GENRE;", ""],
-  ["    if (strcmp(t->mood, mood) == 0)", ""],
-  ["        score += PTS_MOOD;", ""],
-  ["    /* rating breaks ties: 8.7 -> +0.87 */", "c"],
-  ["    score += atof(t->rating) / 10.0;", ""],
-  ["    return score;", ""],
-  ["}", "k"],
-], 11.5);
-techPanel(s, 8.5, 1.95, W - M - 8.5, 4.7, "C techniques here", [
-  "static — file-private function (encapsulation)",
-  "const Title * — pointer to a read-only struct",
-  "strcmp() — string compare, <string.h>",
-  "atof() — text to double, <stdlib.h>",
-  "#define — compile-time constants",
-]);
-footer(s, 9);
+  // Large quote box
+  card(s, M, 1.85, W-2*M, 1.35, CARD);
+  s.addText('"You\'ve been scrolling for 20 minutes and still can\'t decide what to watch."',
+    { x:M+0.4, y:1.95, w:W-2*M-0.8, h:1.15, margin:0, align:"center",
+      fontFace:HFONT, fontSize:22, color:AMBER, italic:true });
 
-// ============================================================ 10. C CODE — THE BRIDGE
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Advanced C · Systems", "One program, two modes — the C↔JS bridge");
-codeBlock(s, M, 1.95, 7.5, 3.9, [
-  ["int main(int argc, char **argv) {", "k"],
-  ["  /* Engine mode: Node runs the program as", "c"],
-  ["     cinematch <medium> <genre> <time>", "c"],
-  ["     <mood> <social>  */", "c"],
-  ["  if (argc == 6) {", ""],
-  ["    recommendJson(argv[1], argv[2],", ""],
-  ["                  argv[3], argv[4],", ""],
-  ["                  argv[5]);", ""],
-  ["    return 0;", ""],
-  ["  }", ""],
-  ["  /* else: ask 5 questions, then", "c"],
-  ["     recommend(...) prints to screen */", "c"],
-  ["}", "k"],
-], 11.5);
-techPanel(s, 8.5, 1.95, W - M - 8.5, 3.9, "C techniques here", [
-  "argc / argv — command-line arguments",
-  "Separate compilation — recommend.h interface",
-  "putchar / fputs — character output",
-  "Exit codes — return 0",
-]);
-// bottom strip — data crossing the bridge
-card(s, M, 6.05, W - 2 * M, 0.92, CARD2);
-s.addText([
-  { text: "C prints to stdout:  ", options: { color: MUTED } },
-  { text: '{"found":true,"title":"Get Out", ... }', options: { color: TEAL, fontFace: "Consolas" } },
-  { text: "   →   ", options: { color: AMBER, bold: true } },
-  { text: "Node.js:  ", options: { color: MUTED } },
-  { text: "JSON.parse(stdout)", options: { color: TEAL, fontFace: "Consolas" } },
-], { x: M + 0.3, y: 6.05, w: W - 2 * M - 0.6, h: 0.92, valign: "middle", margin: 0, fontFace: BFONT, fontSize: 13 });
-footer(s, 10);
+  // 3 problem cards
+  const probs = [
+    ["🗂️","Too Many Choices","Netflix has 15,000+ titles.\nSteam has 50,000+ games.\nMore options = harder decisions."],
+    ["🧠","No Mood Filter","Platforms use viewing history —\nnot how you feel tonight.\nPast ≠ Present."],
+    ["👥","Context is Ignored","Are you alone or with friends?\nTired or energetic?\nExisting systems don't ask."],
+  ];
+  probs.forEach(([icon,title,body],i) => {
+    const x = M + i * ((W-2*M)/3 + 0.05);
+    card(s, x, 3.4, (W-2*M)/3 - 0.08, 2.85);
+    s.addText(icon, { x, y:3.6, w:(W-2*M)/3-0.08, h:0.55, margin:0, align:"center", fontSize:26 });
+    s.addText(title, { x:x+0.2, y:4.2, w:(W-2*M)/3-0.4, h:0.45, margin:0,
+      fontFace:BFONT, fontSize:16, bold:true, color:AMBER, align:"center" });
+    s.addText(body, { x:x+0.2, y:4.7, w:(W-2*M)/3-0.4, h:1.4, margin:0,
+      fontFace:BFONT, fontSize:12, color:TEXT, align:"center", lineSpacingMultiple:1.3 });
+  });
 
-// ============================================================ 11. FEATURES (2x2)
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "The Product", "Four pages, one app");
-const feats = [
-  ["✨", "AI Match", "The core feature. Type a mood, get one explained pick from the curated 55-title library."],
-  ["🎬", "Movies", "Browse thousands of real films from the open TMDB dataset — search, filter, posters, details."],
-  ["🎮", "Games", "Browse 800,000+ titles from the open RAWG dataset — covers, ratings, and detail views."],
-  ["💬", "Discussion", "Search any film for AI analysis: cast, theme, epic moments, and discussion questions."],
-];
-const fw = (W - 2*M - 0.5) / 2, fh = 2.05;
-let fi = 0;
-for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) {
-  const fx = M + c * (fw + 0.5), fy = 2.1 + r * (fh + 0.4);
-  const [ic, t, d] = feats[fi++];
-  card(s, fx, fy, fw, fh);
-  s.addShape(pres.shapes.OVAL, { x: fx + 0.35, y: fy + 0.45, w: 1.05, h: 1.05, fill: { color: CARD2 }, line: { color: AMBER, width: 1.5 } });
-  s.addText(ic, { x: fx + 0.35, y: fy + 0.45, w: 1.05, h: 1.05, align: "center", valign: "middle", margin: 0, fontSize: 32 });
-  s.addText(t, { x: fx + 1.7, y: fy + 0.4, w: fw - 2.0, h: 0.5, margin: 0, fontFace: HFONT, fontSize: 22, bold: true, color: AMBER });
-  s.addText(d, { x: fx + 1.7, y: fy + 0.95, w: fw - 2.0, h: 0.95, margin: 0, fontFace: BFONT, fontSize: 13.5, color: TEXT, lineSpacingMultiple: 1.12 });
+  footer(s, 2, 1);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 3  —  Our Solution  (Member 1)
+// ════════════════════════════════════════════════════════════════════════
+(function slide3() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 1  ·  Introduction", "CINEMATCH — The Solution");
+  memberTag(s, 1);
+
+  // User input example
+  card(s, M, 1.85, 5.8, 0.75, CARD2);
+  s.addText("You type:  ", { x:M+0.3, y:1.92, w:1.4, h:0.6, margin:0,
+    fontFace:BFONT, fontSize:13, color:MUTED });
+  s.addText('"something scary but short to watch with friends tonight"',
+    { x:M+1.5, y:1.92, w:4, h:0.6, margin:0,
+      fontFace:BFONT, fontSize:13, color:AMBER, italic:true });
+
+  // Three pipeline steps (horizontal)
+  const steps = [
+    ["1","AI reads your mood","Converts natural language\ninto 5 structured preferences\n(genre, time, mood, medium, social)"],
+    ["2","C engine scores","Runs a weighted algorithm\nacross 55 curated titles\nand picks the best match"],
+    ["3","AI explains","Writes a personalized\nexplanation of why that\nspecific title fits you now"],
+  ];
+  const sw = (W-2*M-0.3) / 3;
+  steps.forEach(([n,title,body], i) => {
+    const x = M + i*(sw+0.15);
+    card(s, x, 2.85, sw, 3.35);
+    // number circle
+    s.addShape(pres.shapes.OVAL, { x:x+sw/2-0.3, y:3.0, w:0.6, h:0.6,
+      fill:{color:AMBER}, line:{color:AMBER,width:0} });
+    s.addText(n, { x:x+sw/2-0.3, y:3.0, w:0.6, h:0.6, margin:0,
+      align:"center", valign:"middle", fontFace:HFONT, fontSize:22, bold:true, color:BG });
+    s.addText(title, { x:x+0.2, y:3.75, w:sw-0.4, h:0.55, margin:0,
+      align:"center", fontFace:BFONT, fontSize:15, bold:true, color:TEXT });
+    s.addText(body, { x:x+0.2, y:4.35, w:sw-0.4, h:1.7, margin:0,
+      align:"center", fontFace:BFONT, fontSize:12, color:MUTED, lineSpacingMultiple:1.3 });
+    // arrow between steps
+    if (i < 2) {
+      s.addShape(pres.shapes.RIGHT_ARROW, { x:x+sw+0.02, y:4.25, w:0.12, h:0.22,
+        fill:{color:AMBER}, line:{color:AMBER,width:0} });
+    }
+  });
+
+  footer(s, 3, 1);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 4  —  Features Overview  (Member 2)
+// ════════════════════════════════════════════════════════════════════════
+(function slide4() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 2  ·  Features", "5 Features of CINEMATCH");
+  memberTag(s, 2);
+
+  const features = [
+    ["✨","AI Match","Describe your mood → AI + C engine\nrecommends the perfect title\nwith a personalized explanation"],
+    ["🎬","Movies Browser","Search & browse hundreds of thousands\nof real films via TMDB.\nPosters, cast, full details."],
+    ["🎮","Games Browser","Search & browse 800,000+ titles\nvia RAWG game database.\nGenre filters, cover art."],
+    ["💬","Discussion","Pick any movie → AI generates\ntheme analysis, epic moments,\ndirector's vision, discussion Qs."],
+    ["📋","History & Accounts","Register, log in, and see all\nyour past AI picks saved\nautomatically with date & mood."],
+  ];
+  const fw = (W-2*M-0.4) / 5;
+  features.forEach(([icon,title,body], i) => {
+    const x = M + i*(fw+0.1);
+    card(s, x, 1.85, fw, 4.35);
+    s.addText(icon, { x, y:2.1, w:fw, h:0.65, margin:0,
+      align:"center", fontSize:30 });
+    s.addText(title, { x:x+0.12, y:2.85, w:fw-0.24, h:0.52, margin:0,
+      align:"center", fontFace:BFONT, fontSize:13.5, bold:true, color:AMBER });
+    s.addText(body, { x:x+0.12, y:3.42, w:fw-0.24, h:2.4, margin:0,
+      align:"center", fontFace:BFONT, fontSize:11.5, color:TEXT, lineSpacingMultiple:1.3 });
+    // highlight bar at bottom of active cards
+    s.addShape(pres.shapes.RECTANGLE, { x:x+0.35, y:5.95, w:fw-0.7, h:0.08,
+      fill:{color:AMBER} });
+  });
+
+  footer(s, 4, 2);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 5  —  Feature Highlights  (Member 2)
+// ════════════════════════════════════════════════════════════════════════
+(function slide5() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 2  ·  Features", "What Makes Each Feature Special");
+  memberTag(s, 2);
+
+  // Left column
+  const lx = M, rx = M + 6.1, cy = 1.9, ch = 1.35, gap2 = 1.5;
+  const items = [
+    [lx, cy,         "✨ AI Match — Core Feature",
+     "The only recommender that converts your current mood into structured preferences and scores them with compiled C code. Result in under 10 seconds."],
+    [lx, cy+gap2,    "🎬 Movies  +  🎮 Games Browser",
+     "Real open databases — TMDB and RAWG. Not a static list. Search anything, filter by 8 genres, see posters and cover art."],
+    [lx, cy+gap2*2,  "💬 Discussion",
+     "Powered by AI + TMDB cast data. Get main theme, epic moments, director's vision, and ready-made discussion questions for any movie."],
+    [rx, cy,         "📋 History — Automatic Saving",
+     "Every AI recommendation is silently saved the moment it appears. Reload the page next week — your history is still there."],
+    [rx, cy+gap2,    "🔐 User Accounts",
+     "Register with a username and password. Passwords are hashed with bcrypt — never stored in plain text. JWT sessions last 7 days."],
+    [rx, cy+gap2*2,  "🛡️ API Key Security",
+     "TMDB, RAWG, and OpenRouter keys live in .env files that are gitignored. Never committed. Never exposed in the browser."],
+  ];
+  items.forEach(([x,y,title,body]) => {
+    card(s, x, y, 5.85, ch, CARD);
+    s.addText(title, { x:x+0.25, y:y+0.15, w:5.3, h:0.42, margin:0,
+      fontFace:BFONT, fontSize:13.5, bold:true, color:AMBER });
+    s.addText(body, { x:x+0.25, y:y+0.6, w:5.3, h:0.7, margin:0,
+      fontFace:BFONT, fontSize:11.5, color:TEXT, lineSpacingMultiple:1.25 });
+  });
+
+  footer(s, 5, 2);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 6  —  System Architecture  (Member 3)
+// ════════════════════════════════════════════════════════════════════════
+(function slide6() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 3  ·  Architecture & C Engine", "System Architecture — Domain-Driven Design");
+  memberTag(s, 3);
+
+  // DDD 4 layers horizontal
+  const layers = [
+    ["Domain","Core rules & data structures\n\nTitle struct, Preferences,\nRecommendation entity\n\nNo HTTP or AI here"],
+    ["Application","Use cases — orchestration\n\nmoodToPreferences\nrecommendForMood\nexplainRecommendation\ndiscussMovie"],
+    ["Infrastructure","Outside-world connections\n\nOpenRouter AI client\nC engine runner\nUser JSON file storage"],
+    ["Interfaces","Entry points for users\n\nExpress HTTP API\n(7 endpoints)\nVite + React frontend"],
+  ];
+  const lw = (W-2*M-0.45)/4;
+  layers.forEach(([ name, body ], i) => {
+    const x = M + i*(lw+0.15);
+    const fill = i === 0 ? "1D2030" : i === 3 ? "201D10" : CARD;
+    const border2 = i === 0 ? TEAL : i === 3 ? AMBER : BORDER;
+    slide_card_border(s, x, 1.85, lw, 4.35, fill, border2);
+    // Arrow between layers
+    if (i < 3) {
+      s.addShape(pres.shapes.RIGHT_ARROW, { x:x+lw+0.01, y:3.75, w:0.13, h:0.22,
+        fill:{color:MUTED}, line:{color:MUTED,width:0} });
+    }
+    s.addText(name, { x:x+0.2, y:2.0, w:lw-0.4, h:0.55, margin:0,
+      align:"center", fontFace:HFONT, fontSize:17, bold:true,
+      color: i===0 ? TEAL : i===3 ? AMBER : TEXT });
+    s.addShape(pres.shapes.RECTANGLE, { x:x+0.3, y:2.62, w:lw-0.6, h:0.04, fill:{color:BORDER} });
+    s.addText(body, { x:x+0.2, y:2.75, w:lw-0.4, h:3.1, margin:0,
+      fontFace:BFONT, fontSize:12, color:TEXT, lineSpacingMultiple:1.35, valign:"top" });
+  });
+
+  // Engine label
+  card(s, M, 6.35, W-2*M, 0.5, "0A0C12");
+  s.addText("🔧  C Engine (cinematch.exe) — compiled binary called by Infrastructure layer via child_process.spawn()",
+    { x:M+0.3, y:6.38, w:W-2*M-0.6, h:0.43, margin:0,
+      fontFace:BFONT, fontSize:12, color:AMBER });
+
+  footer(s, 6, 3);
+})();
+
+function slide_card_border(s, x, y, w, h, fill, borderColor) {
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius:0.08,
+    fill:{color:fill}, line:{color:borderColor,width:2}, shadow:shadow() });
 }
-footer(s, 11);
 
-// ============================================================ 12. RELIABILITY
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Reliability", "Never crash in a live demo");
-s.addText("Free AI models rate-limit and fail. CINEMATCH degrades gracefully at every layer.",
-  { x: M, y: 1.7, w: W - 2*M, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 14, color: MUTED });
-// fallback chain visual
-const chain = ["Qwen3", "Llama-3.3-70B", "GPT-OSS-120B", "Keyword fallback"];
-let chx = M;
-const chw = 2.7;
-chain.forEach((t, i) => {
-  const last = i === chain.length - 1;
-  card(s, chx, 2.3, chw, 0.95, last ? CARD : CARD2);
-  s.addText(t, { x: chx, y: 2.3, w: chw, h: 0.95, align: "center", valign: "middle", margin: 0,
-    fontFace: BFONT, fontSize: 14, bold: true, color: last ? AMBER : TEXT });
-  if (i < chain.length - 1) s.addText("→", { x: chx + chw - 0.05, y: 2.3, w: 0.5, h: 0.95, align: "center", valign: "middle",
-    margin: 0, fontFace: BFONT, fontSize: 22, color: AMBER, bold: true });
-  chx += chw + 0.45;
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 7  —  C Engine: Struct & Scoring  (Member 3)
+// ════════════════════════════════════════════════════════════════════════
+(function slide7() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 3  ·  Architecture & C Engine", "C Engine — Data Structure & Scoring Algorithm");
+  memberTag(s, 3);
+
+  // Code block left: Title struct
+  codeBlock(s, M, 1.85, 6.0, 2.5, [
+    ["/* titles.h — the Title data structure */", "c"],
+    ["typedef struct {", ""],
+    ['    const char *type;    /* "Movie" or "Game"   */', "c"],
+    ['    const char *title;   /* display name        */', "c"],
+    ["    int         year;", ""],
+    ['    const char *genre;   /* action/cozy/scifi…  */', "c"],
+    ['    const char *mood;    /* intense/relaxed/deep */', "c"],
+    ['    const char *timeNeed;/* short/medium/long    */', "c"],
+    ['    const char *social;  /* solo/group/any       */', "c"],
+    ["    const char *rating;  /* e.g. \"8.6\"          */", ""],
+    ["    const char *desc;", ""],
+    ["} Title;", "k"],
+    ["extern Title library[55];  /* all 55 titles */", ""],
+  ], 11);
+
+  // Code block left bottom: scoring weights
+  codeBlock(s, M, 4.5, 6.0, 2.2, [
+    ["/* Scoring weights in recommend.c */", "c"],
+    ["#define PTS_GENRE      6  /* strongest signal */", "k"],
+    ["#define PTS_MEDIUM     5", ""],
+    ["#define PTS_MOOD       4", ""],
+    ["#define PTS_TIME_EXACT 3", ""],
+    ["#define PTS_TIME_ADJ   1  /* neighbouring length */", "c"],
+    ["#define PTS_SOCIAL     2", ""],
+    ["/* rating / 10.0 added as tiebreaker */", "c"],
+  ], 11);
+
+  // Right: weights explanation table
+  card(s, 6.85, 1.85, 5.75, 4.85);
+  s.addText("Scoring Rules", { x:7.1, y:2.0, w:5.1, h:0.45, margin:0,
+    fontFace:BFONT, fontSize:16, bold:true, color:AMBER });
+  const rows = [
+    ["Criterion","Points","Why"],
+    ["Genre match","6","Strongest preference signal"],
+    ["Medium match","5","Movie vs Game is binary"],
+    ["Mood match","4","Emotional tone matters most"],
+    ["Time — exact","3","Short/medium/long fit"],
+    ["Time — adjacent","1","Close enough still counts"],
+    ["Social match","2","Solo vs group is clear"],
+    ["Rating ÷ 10","tiebreaker","E.g. 8.6 → adds +0.86"],
+  ];
+  rows.forEach((row, ri) => {
+    row.forEach((cell, ci) => {
+      const cx = [7.1, 9.55, 10.55][ci];
+      const cw = [2.3, 0.9, 2.6][ci];
+      const isHead = ri === 0;
+      s.addText(cell, { x:cx, y:2.55+ri*0.52, w:cw, h:0.46, margin:0,
+        fontFace:BFONT, fontSize:isHead?11:12,
+        bold:isHead, color:isHead?AMBER : ci===1?TEAL : TEXT,
+        align: ci===1?"center":"left" });
+    });
+    if (ri > 0) {
+      s.addShape(pres.shapes.RECTANGLE, { x:7.1, y:2.55+ri*0.52, w:5.3, h:0.01, fill:{color:BORDER} });
+    }
+  });
+
+  footer(s, 7, 3);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 8  —  C Engine: Engine Mode  (Member 3)
+// ════════════════════════════════════════════════════════════════════════
+(function slide8() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 3  ·  Architecture & C Engine", "C Engine — Engine Mode & Node.js Integration");
+  memberTag(s, 3);
+
+  // Left: main.c engine mode branch
+  codeBlock(s, M, 1.85, 6.0, 2.85, [
+    ["/* main.c — two modes */", "c"],
+    ["int main(int argc, char **argv) {", ""],
+    ["", ""],
+    ["  /* Engine mode: Node calls with 5 args */", "c"],
+    ["  if (argc == 6) {", "k"],
+    ["    recommendJson(argv[1], argv[2],", ""],
+    ["                  argv[3], argv[4], argv[5]);", ""],
+    ["    return 0;   /* prints JSON, exits */", "c"],
+    ["  }", ""],
+    ["", ""],
+    ["  /* Interactive mode: asks 5 questions */", "c"],
+    ["  /* ... quiz code ... */", "c"],
+    ["}", ""],
+  ], 11);
+
+  // Left bottom: JSON output example
+  codeBlock(s, M, 4.85, 6.0, 1.85, [
+    ["/* Output printed to stdout (Node reads this): */","c"],
+    ['{\"found\":true,\"type\":\"Movie\",', ""],
+    [' \"title\":\"Alien\",\"year\":1979,', ""],
+    [' \"genre\":\"horror\",\"rating\":\"8.5\"}', "k"],
+  ], 11);
+
+  // Right: Node.js spawn code
+  codeBlock(s, 6.85, 1.85, 5.75, 2.85, [
+    ["// infrastructure/cEngine.js", "c"],
+    ["const { spawnSync } = require('child_process');", ""],
+    ["", ""],
+    ["function callEngine(prefs) {", "k"],
+    ["  const r = spawnSync('./cinematch.exe',", ""],
+    ["    [prefs.medium, prefs.genre,", ""],
+    ["     prefs.timeNeed, prefs.mood,", ""],
+    ["     prefs.social]);", ""],
+    ["", ""],
+    ["  return JSON.parse(r.stdout.toString());", "k"],
+    ["}",""],
+  ], 11);
+
+  // Right: key points
+  card(s, 6.85, 4.85, 5.75, 1.85, CARD);
+  s.addText("Why this design?", { x:7.1, y:5.0, w:5.2, h:0.38, margin:0,
+    fontFace:BFONT, fontSize:13, bold:true, color:AMBER });
+  const pts = ["C and JavaScript stay completely independent","JSON is the language-agnostic contract","C runs as a separate process — maximum speed","Same C binary works in terminal and from the server"];
+  const runs2 = pts.map(t => ({ text:"  "+t,
+    options:{ breakLine:true, fontFace:BFONT, fontSize:11.5, color:TEXT,
+      paraSpaceAfter:5, bullet:{code:"25CF",indent:14,color:AMBER} } }));
+  s.addText(runs2, { x:7.1, y:5.45, w:5.2, h:1.15, margin:0, valign:"top" });
+
+  footer(s, 8, 3);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 9  —  AI Integration: OpenRouter  (Member 4)
+// ════════════════════════════════════════════════════════════════════════
+(function slide9() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 4  ·  AI & APIs", "AI Integration — OpenRouter & Fallback Chain");
+  memberTag(s, 4);
+
+  // What is OpenRouter
+  card(s, M, 1.85, 5.8, 1.45, CARD);
+  s.addText("What is OpenRouter?", { x:M+0.25, y:1.98, w:5.2, h:0.42, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+  s.addText("A single API endpoint that gives access to dozens of large language models — the same interface as OpenAI.\nWe use free-tier models, so running CINEMATCH costs $0.",
+    { x:M+0.25, y:2.44, w:5.2, h:0.75, margin:0,
+      fontFace:BFONT, fontSize:12, color:TEXT, lineSpacingMultiple:1.3 });
+
+  // Fallback chain diagram
+  s.addText("Fallback Chain  (runs automatically on rate-limit or server error)",
+    { x:M, y:3.52, w:W-2*M, h:0.38, margin:0,
+      fontFace:BFONT, fontSize:13, bold:true, color:TEXT });
+
+  const chain = [
+    ["1","Qwen3 235B","Primary model\n(free tier)","Try first"],
+    ["2","Llama 3.3 70B","Fallback\n(free tier)","If 429 / 5xx"],
+    ["3","GPT-OSS 120B","Second fallback\n(free tier)","If still fails"],
+    ["4","Keyword Match","Built-in fallback\n(no AI needed)","Guaranteed result"],
+  ];
+  const cw = (W-2*M-0.45)/4;
+  chain.forEach(([n,name,sub,when],i) => {
+    const x = M + i*(cw+0.15);
+    const isLast = i === 3;
+    slide_card_border(s, x, 4.05, cw, 2.2, isLast?"0A0C12":CARD, isLast?GREEN:BORDER);
+    s.addShape(pres.shapes.OVAL, { x:x+cw/2-0.22, y:4.18, w:0.44, h:0.44,
+      fill:{color:isLast?GREEN:AMBER} });
+    s.addText(n, { x:x+cw/2-0.22, y:4.18, w:0.44, h:0.44, margin:0,
+      align:"center", valign:"middle", fontFace:BFONT, fontSize:14, bold:true,
+      color:isLast?BG:BG });
+    s.addText(name, { x:x+0.1, y:4.72, w:cw-0.2, h:0.45, margin:0,
+      align:"center", fontFace:BFONT, fontSize:12, bold:true, color:isLast?GREEN:AMBER });
+    s.addText(sub, { x:x+0.1, y:5.2, w:cw-0.2, h:0.55, margin:0,
+      align:"center", fontFace:BFONT, fontSize:11, color:TEXT });
+    s.addText(when, { x:x+0.1, y:5.82, w:cw-0.2, h:0.35, margin:0,
+      align:"center", fontFace:BFONT, fontSize:10.5, color:MUTED, italic:true });
+    if (i<3) {
+      s.addShape(pres.shapes.RIGHT_ARROW, { x:x+cw+0.01, y:4.98, w:0.13, h:0.22,
+        fill:{color:MUTED} });
+    }
+  });
+
+  // Right side: key point
+  card(s, 6.85, 1.85, 5.75, 1.45, CARD2);
+  s.addText("Why a fallback chain?", { x:7.1, y:1.98, w:5.2, h:0.38, margin:0,
+    fontFace:BFONT, fontSize:13, bold:true, color:AMBER });
+  s.addText("Free AI models have rate limits. During a live demo, any single model might be rate-limited. The chain guarantees a result is always returned — even without any AI.",
+    { x:7.1, y:2.4, w:5.2, h:0.8, margin:0,
+      fontFace:BFONT, fontSize:12, color:TEXT, lineSpacingMultiple:1.3 });
+
+  footer(s, 9, 4);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 10  —  AI Pipeline  (Member 4)
+// ════════════════════════════════════════════════════════════════════════
+(function slide10() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 4  ·  AI & APIs", "AI Pipeline — Mood → Preferences → Explanation");
+  memberTag(s, 4);
+
+  // Task 1
+  card(s, M, 1.85, 5.8, 4.85, CARD);
+  s.addText("Task 1 — Mood to Preferences", { x:M+0.25, y:2.0, w:5.2, h:0.45, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+
+  card(s, M+0.2, 2.55, 5.4, 0.65, CARD2);
+  s.addText('"something scary but short to watch with friends tonight"',
+    { x:M+0.4, y:2.6, w:5.0, h:0.55, margin:0,
+      fontFace:BFONT, fontSize:13, color:TEXT, italic:true });
+
+  s.addText("↓  AI returns JSON:", { x:M+0.25, y:3.3, w:5.2, h:0.35, margin:0,
+    fontFace:BFONT, fontSize:11, color:MUTED });
+
+  codeBlock(s, M+0.2, 3.7, 5.4, 1.55, [
+    ['{', ""],
+    ['  "genre":    "horror",', "k"],
+    ['  "timeNeed": "short",', "k"],
+    ['  "social":   "group",', "k"],
+    ['  "mood":     "intense"', "k"],
+    ['}', ""],
+  ], 11.5);
+
+  s.addText("These 5 values become the C engine's input arguments.",
+    { x:M+0.25, y:5.35, w:5.2, h:0.4, margin:0,
+      fontFace:BFONT, fontSize:11.5, color:MUTED });
+
+  s.addText("Strict system prompt forces JSON-only output.\nResponse validated before use — fallback if empty.",
+    { x:M+0.25, y:5.8, w:5.2, h:0.7, margin:0,
+      fontFace:BFONT, fontSize:11, color:MUTED, italic:true });
+
+  // Task 2
+  card(s, 6.85, 1.85, 5.75, 4.85, CARD);
+  s.addText("Task 2 — Personalized Explanation", { x:7.1, y:2.0, w:5.2, h:0.45, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+
+  s.addText("After C engine picks the best title, AI writes why it fits:",
+    { x:7.1, y:2.55, w:5.2, h:0.4, margin:0, fontFace:BFONT, fontSize:12, color:TEXT });
+
+  card(s, 7.05, 3.05, 5.35, 1.4, CARD2);
+  s.addText('"Alien is the perfect pick for a short, intense group night — its claustrophobic tension builds fast and hits hard, exactly the kind of scary that works best when everyone is watching together."',
+    { x:7.2, y:3.12, w:5.0, h:1.25, margin:0,
+      fontFace:BFONT, fontSize:12, color:AMBER, italic:true, lineSpacingMultiple:1.35 });
+
+  s.addText("Always references the user's original mood — never generic.", { x:7.1, y:4.55, w:5.2, h:0.35,
+    margin:0, fontFace:BFONT, fontSize:11.5, color:TEAL });
+
+  const pts2 = ["Same OpenRouter client, same fallback chain","Rich fallback text if AI fails completely","Two separate API calls per recommendation"];
+  const runs3 = pts2.map(t => ({ text:"  "+t,
+    options:{ breakLine:true, fontFace:BFONT, fontSize:12, color:TEXT,
+      paraSpaceAfter:8, bullet:{code:"25CF",indent:14,color:AMBER} } }));
+  s.addText(runs3, { x:7.1, y:5.08, w:5.2, h:1.5, margin:0, valign:"top" });
+
+  footer(s, 10, 4);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 11  —  External APIs  (Member 4)
+// ════════════════════════════════════════════════════════════════════════
+(function slide11() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 4  ·  AI & APIs", "External APIs — TMDB & RAWG");
+  memberTag(s, 4);
+
+  // TMDB card
+  card(s, M, 1.85, 5.85, 4.85);
+  s.addText("🎬  TMDB  —  The Movie Database", { x:M+0.25, y:2.02, w:5.2, h:0.48, margin:0,
+    fontFace:BFONT, fontSize:16, bold:true, color:AMBER });
+  s.addText("image.tmdb.org  ·  Free API  ·  Hundreds of thousands of films",
+    { x:M+0.25, y:2.55, w:5.2, h:0.35, margin:0, fontFace:BFONT, fontSize:11.5, color:MUTED });
+  const tmdbPts = [
+    "Movies page — search by title, 8 genre filters, poster grid",
+    "Movies page — click → cast list, overview, rating, release year",
+    "Discussion page — movie search + backdrop images",
+    "Discussion page — cast with profile photos",
+    "Discussion page — overview sent to AI for analysis",
+    "Poster images fetched at w342 resolution from TMDB CDN",
+  ];
+  const tr = tmdbPts.map(t=>({ text:"  "+t,
+    options:{breakLine:true,fontFace:BFONT,fontSize:12.5,color:TEXT,
+      paraSpaceAfter:9, bullet:{code:"25CF",indent:14,color:AMBER}} }));
+  s.addText(tr, { x:M+0.25, y:3.05, w:5.3, h:3.35, margin:0, valign:"top" });
+
+  // RAWG card
+  card(s, 6.85, 1.85, 5.75, 4.85);
+  s.addText("🎮  RAWG  —  Video Games Database", { x:7.1, y:2.02, w:5.2, h:0.48, margin:0,
+    fontFace:BFONT, fontSize:16, bold:true, color:AMBER });
+  s.addText("rawg.io  ·  Free API  ·  800,000+ game titles",
+    { x:7.1, y:2.55, w:5.2, h:0.35, margin:0, fontFace:BFONT, fontSize:11.5, color:MUTED });
+  const rawgPts = [
+    "Games page — search by title across 800K+ titles",
+    "Games page — 9 genre filters (Action, RPG, Strategy…)",
+    "Games page — cover art grid with developer & rating",
+    "Games page — click → full description, platforms, tags",
+    "Free tier: 20,000 requests/month (well within our use)",
+  ];
+  const rr = rawgPts.map(t=>({ text:"  "+t,
+    options:{breakLine:true,fontFace:BFONT,fontSize:12.5,color:TEXT,
+      paraSpaceAfter:9, bullet:{code:"25CF",indent:14,color:AMBER}} }));
+  s.addText(rr, { x:7.1, y:3.05, w:5.2, h:3.35, margin:0, valign:"top" });
+
+  // Security note at bottom
+  card(s, M, 6.85, W-2*M, 0.42, "0A0C12");
+  s.addText("🔐  Security:  All API keys stored in .env files  ·  Listed in .gitignore  ·  Never committed to GitHub  ·  Never exposed in the browser",
+    { x:M+0.3, y:6.88, w:W-2*M-0.6, h:0.35, margin:0,
+      fontFace:BFONT, fontSize:11.5, color:AMBER });
+
+  footer(s, 11, 4);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 12  —  Backend Structure  (Member 5)
+// ════════════════════════════════════════════════════════════════════════
+(function slide12() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 5  ·  Backend", "Backend — Express Server & API Endpoints");
+  memberTag(s, 5);
+
+  // Endpoint table
+  const endpoints = [
+    ["Method","Endpoint","Purpose","Auth?"],
+    ["POST","/api/recommend","Run full AI + C engine pipeline","—"],
+    ["POST","/api/discuss","AI discussion analysis for a movie","—"],
+    ["GET", "/api/titles","Return full 55-title library as JSON","—"],
+    ["POST","/api/auth/register","Create a new user account","—"],
+    ["POST","/api/auth/login","Login and receive a JWT token","—"],
+    ["GET", "/api/history","Load user's recommendation history","✓ JWT"],
+    ["POST","/api/history","Save a recommendation to history","✓ JWT"],
+  ];
+  endpoints.forEach((row, ri) => {
+    row.forEach((cell, ci) => {
+      const cx = [M, M+1.1, M+4.05, M+10.05][ci];
+      const cw = [1.0, 2.85, 5.9, 1.6][ci];
+      const isHead = ri === 0;
+      const isAuth = ci===3 && cell.includes("✓");
+      s.addText(cell, { x:cx, y:1.92+ri*0.54, w:cw, h:0.46, margin:0,
+        fontFace: ci===1?"Consolas":BFONT,
+        fontSize: isHead?11.5:12,
+        bold: isHead || (ci===0&&!isHead),
+        color: isHead ? AMBER
+             : ci===0 ? (cell==="POST"?"#E07070":TEAL)
+             : ci===1 ? KEY
+             : isAuth ? GREEN : TEXT,
+        align: ci===3?"center":"left" });
+      if (ri>0 && ci===0) {
+        s.addShape(pres.shapes.RECTANGLE, { x:M, y:1.92+ri*0.54+0.45, w:W-2*M, h:0.01, fill:{color:BORDER} });
+      }
+    });
+  });
+
+  // DDD reminder
+  card(s, M, 5.72, W-2*M, 1.0, CARD);
+  s.addText("DDD Layer: each endpoint is a thin HTTP wrapper  ·  validates input  →  calls Application layer  →  returns JSON",
+    { x:M+0.3, y:5.85, w:W-2*M-0.6, h:0.35, margin:0,
+      fontFace:BFONT, fontSize:12.5, color:TEXT });
+  s.addText("No business logic lives in the Interface layer.  Business rules stay in Domain & Application.",
+    { x:M+0.3, y:6.22, w:W-2*M-0.6, h:0.35, margin:0,
+      fontFace:BFONT, fontSize:11.5, color:MUTED, italic:true });
+
+  footer(s, 12, 5);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 13  —  User Authentication  (Member 5)
+// ════════════════════════════════════════════════════════════════════════
+(function slide13() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 5  ·  Backend", "User Authentication — bcrypt + JWT");
+  memberTag(s, 5);
+
+  // Registration flow
+  card(s, M, 1.85, 5.85, 2.55, CARD);
+  s.addText("Registration Flow", { x:M+0.25, y:2.0, w:5.2, h:0.42, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+  codeBlock(s, M+0.2, 2.5, 5.4, 1.75, [
+    ["// application/auth.js", "c"],
+    ["const hash = await bcrypt.hash(password, 10);", "k"],
+    ["// 10 salt rounds — industry standard", "c"],
+    ["createUser(username, hash);", ""],
+    ["// Plain password is NEVER stored", "c"],
+  ], 11);
+
+  // Login flow
+  card(s, M, 4.55, 5.85, 2.15, CARD);
+  s.addText("Login Flow", { x:M+0.25, y:4.68, w:5.2, h:0.42, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+  codeBlock(s, M+0.2, 5.15, 5.4, 1.45, [
+    ["const ok = await bcrypt.compare(password, hash);", ""],
+    ["if (!ok) throw new Error('Wrong credentials');", ""],
+    ["const token = jwt.sign({id,username}, SECRET,", "k"],
+    ["                       { expiresIn: '7d' });", "k"],
+  ], 11);
+
+  // Right: JWT explanation
+  card(s, 6.85, 1.85, 5.75, 2.55, CARD);
+  s.addText("JSON Web Token (JWT)", { x:7.1, y:2.0, w:5.2, h:0.42, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+  const jwtPts = [
+    "Signed with a secret key on the server",
+    "Contains: user ID + username",
+    "Expires after 7 days automatically",
+    "Frontend stores it in localStorage",
+    "Sent as:  Authorization: Bearer <token>",
+    "Protected endpoints verify it on every request",
+  ];
+  const jr = jwtPts.map(t=>({ text:"  "+t,
+    options:{breakLine:true,fontFace:BFONT,fontSize:12.5,color:TEXT,
+      paraSpaceAfter:7, bullet:{code:"25CF",indent:14,color:AMBER}} }));
+  s.addText(jr, { x:7.1, y:2.52, w:5.2, h:1.75, margin:0, valign:"top" });
+
+  // Storage
+  card(s, 6.85, 4.55, 5.75, 2.15, CARD2);
+  s.addText("Storage — server/data/users.json", { x:7.1, y:4.68, w:5.2, h:0.42, margin:0,
+    fontFace:BFONT, fontSize:13, bold:true, color:AMBER });
+  codeBlock(s, 7.05, 5.12, 5.35, 1.48, [
+    ["{ id, username, passwordHash,", ""],
+    ["  createdAt, history: [ ...50 entries ] }", ""],
+    ["// Gitignored — never in GitHub", "c"],
+  ], 11);
+
+  footer(s, 13, 5);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 14  —  Complete Data Flow  (Member 6)
+// ════════════════════════════════════════════════════════════════════════
+(function slide14() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 6  ·  Conclusion", "Complete Data Flow — Request Lifecycle");
+  memberTag(s, 6);
+
+  const steps = [
+    ["1","React Frontend","User types mood & submits\n\nPOST /api/recommend\n{ text: 'scary short…' }"],
+    ["2","AI — Mood Parse","OpenRouter converts mood\nto structured JSON\n\n{genre:horror, time:short,\n social:group, mood:intense}"],
+    ["3","C Engine","Spawned as child_process\nwith 5 args\n\nScores all 55 titles\nReturns JSON via stdout"],
+    ["4","AI — Explain","Best title sent to AI\n\n'Alien — perfect for\n intense group night…'\n(2-sentence explanation)"],
+    ["5","Response","Full JSON returned\nto React frontend\n\nResult card shown + saved\nto user history"],
+  ];
+  const sw2 = (W-2*M-0.6)/5;
+  steps.forEach(([n,name,body], i) => {
+    const x = M + i*(sw2+0.15);
+    const col = [AMBER, TEAL, "#E07070", TEAL, GREEN][i];
+    slide_card_border(s, x, 1.85, sw2, 4.85, CARD, col);
+    s.addShape(pres.shapes.OVAL, { x:x+sw2/2-0.28, y:2.0, w:0.56, h:0.56,
+      fill:{color:col} });
+    s.addText(n, { x:x+sw2/2-0.28, y:2.0, w:0.56, h:0.56, margin:0,
+      align:"center", valign:"middle", fontFace:HFONT, fontSize:20, bold:true, color:BG });
+    s.addText(name, { x:x+0.1, y:2.68, w:sw2-0.2, h:0.48, margin:0,
+      align:"center", fontFace:BFONT, fontSize:13, bold:true, color:col });
+    s.addShape(pres.shapes.RECTANGLE, { x:x+0.3, y:3.2, w:sw2-0.6, h:0.02, fill:{color:BORDER} });
+    s.addText(body, { x:x+0.1, y:3.3, w:sw2-0.2, h:3.0, margin:0,
+      align:"center", fontFace:BFONT, fontSize:11.5, color:TEXT, lineSpacingMultiple:1.35 });
+    if (i<4) {
+      s.addShape(pres.shapes.RIGHT_ARROW, { x:x+sw2+0.01, y:4.18, w:0.13, h:0.22,
+        fill:{color:MUTED} });
+    }
+  });
+
+  // Timing strip
+  card(s, M, 6.85, W-2*M, 0.4, "0A0C12");
+  s.addText("⏱  Typical total round-trip: 6 – 10 seconds on free AI tier   ·   C engine scoring: < 1 ms",
+    { x:M+0.3, y:6.88, w:W-2*M-0.6, h:0.33, margin:0,
+      fontFace:BFONT, fontSize:12, color:MUTED });
+
+  footer(s, 14, 6);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 15  —  Testing & Evaluation  (Member 6)
+// ════════════════════════════════════════════════════════════════════════
+(function slide15() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 6  ·  Conclusion", "Testing & Evaluation");
+  memberTag(s, 6);
+
+  // Test table
+  const cols = ["Mood Input","Expected Genre / Context","Actual Result","Status"];
+  const rows2 = [
+    ['"relaxing cozy solo night"',        "Cozy · Relaxed · Solo",       "🎮 Balatro (2024)",          "✓ Pass"],
+    ['"scary horror with a group"',       "Horror · Intense · Group",    "🎬 Alien (1979)",            "✓ Pass"],
+    ['"epic action game for hours"',      "Action · Long · Solo",        "🎮 Super Mario Odyssey",     "✓ Pass"],
+    ['"thoughtful sci-fi, alone"',        "Sci-Fi · Deep · Solo",        "🎬 Arrival (2016)",          "✓ Pass"],
+  ];
+  const cws = [3.4, 2.7, 3.1, 1.1];
+  const cxs = [M, M+3.45, M+6.2, M+9.35];
+  cols.forEach((c,ci) => {
+    s.addText(c, { x:cxs[ci], y:1.88, w:cws[ci], h:0.4, margin:0,
+      fontFace:BFONT, fontSize:11.5, bold:true, color:AMBER });
+  });
+  s.addShape(pres.shapes.RECTANGLE, { x:M, y:2.3, w:W-2*M, h:0.02, fill:{color:AMBER} });
+
+  rows2.forEach((row,ri) => {
+    row.forEach((cell,ci) => {
+      s.addText(cell, { x:cxs[ci], y:2.38+ri*0.62, w:cws[ci], h:0.56, margin:0,
+        fontFace:BFONT, fontSize:12,
+        color: ci===3 ? GREEN : ci===2 ? TEAL : TEXT,
+        bold: ci===3 });
+    });
+    s.addShape(pres.shapes.RECTANGLE, { x:M, y:2.38+ri*0.62+0.56, w:W-2*M, h:0.01, fill:{color:BORDER} });
+  });
+
+  // Edge cases
+  s.addText("Edge Cases", { x:M, y:5.1, w:W-2*M, h:0.4, margin:0,
+    fontFace:BFONT, fontSize:14, bold:true, color:AMBER });
+  const edges = [
+    ["Mixed Mood","'funny but also scary' → genre with higher scoring weight wins"],
+    ["AI Failure","All 3 models fail → keyword fallback → still returns a result"],
+    ["Empty Input","Server returns HTTP 400 → frontend shows clear error message"],
+    ["Gibberish","AI still extracts preferences → C engine picks closest match"],
+  ];
+  const ecw = (W-2*M-0.45)/4;
+  edges.forEach(([title,body],i) => {
+    card(s, M+i*(ecw+0.15), 5.6, ecw, 1.6, CARD);
+    s.addText(title, { x:M+i*(ecw+0.15)+0.15, y:5.73, w:ecw-0.3, h:0.38, margin:0,
+      fontFace:BFONT, fontSize:12, bold:true, color:AMBER, align:"center" });
+    s.addText(body, { x:M+i*(ecw+0.15)+0.15, y:6.16, w:ecw-0.3, h:0.88, margin:0,
+      fontFace:BFONT, fontSize:11, color:TEXT, align:"center", lineSpacingMultiple:1.25 });
+  });
+
+  footer(s, 15, 6);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 16  —  Limitations & Future Work  (Member 6)
+// ════════════════════════════════════════════════════════════════════════
+(function slide16() {
+  const s = pres.addSlide(); s.background = {color:BG};
+  header(s, "Member 6  ·  Conclusion", "Limitations & Future Work");
+  memberTag(s, 6);
+
+  // Left: Limitations
+  card(s, M, 1.85, 5.85, 4.85, CARD);
+  s.addText("⚠  Current Limitations", { x:M+0.25, y:2.0, w:5.2, h:0.45, margin:0,
+    fontFace:BFONT, fontSize:15, bold:true, color:"E07070" });
+  const lims = [
+    "AI Match recommends only from the 55-title curated library — browse pages use open databases",
+    "App runs locally — not yet deployed on a public server",
+    "Free AI models can be slow or rate-limited during peak hours",
+    "No user feedback loop — the system does not learn from ratings",
+  ];
+  const lr = lims.map(t=>({ text:"  "+t,
+    options:{breakLine:true,fontFace:BFONT,fontSize:13,color:TEXT,
+      paraSpaceAfter:18, bullet:{code:"25CF",indent:14,color:"E07070"}} }));
+  s.addText(lr, { x:M+0.25, y:2.58, w:5.2, h:3.85, margin:0, valign:"top" });
+
+  // Right: Future Work
+  card(s, 6.85, 1.85, 5.75, 4.85, CARD);
+  s.addText("🚀  Future Work", { x:7.1, y:2.0, w:5.2, h:0.45, margin:0,
+    fontFace:BFONT, fontSize:15, bold:true, color:TEAL });
+  const future = [
+    ["User Profiles","Watch history and long-term preferences per account"],
+    ["Personalization","Feedback ratings improve future recommendations"],
+    ["Larger Library","Expand C engine library from 55 to 500+ titles"],
+    ["Cloud Deployment","Host on a server — accessible from any device, anywhere"],
+    ["Automated Tests","Unit tests for C scoring logic to prevent regressions"],
+  ];
+  future.forEach(([title, body], i) => {
+    const ny = 2.6 + i * 0.84;
+    s.addText(`${i+1}.  `, { x:7.1, y:ny, w:0.5, h:0.38, margin:0,
+      fontFace:BFONT, fontSize:13, bold:true, color:AMBER });
+    s.addText(title, { x:7.5, y:ny, w:4.0, h:0.38, margin:0,
+      fontFace:BFONT, fontSize:13, bold:true, color:TEAL });
+    s.addText(body, { x:7.5, y:ny+0.38, w:4.0, h:0.38, margin:0,
+      fontFace:BFONT, fontSize:11.5, color:MUTED });
+  });
+
+  footer(s, 16, 6);
+})();
+
+// ════════════════════════════════════════════════════════════════════════
+//  SLIDE 17  —  Thank You  (Member 6)
+// ════════════════════════════════════════════════════════════════════════
+(function slide17() {
+  const s = pres.addSlide(); s.background = {color:BG};
+
+  // Amber glow circle behind text
+  s.addShape(pres.shapes.OVAL, { x:4.15, y:1.2, w:5.0, h:5.0,
+    fill:{color:"1A1200"}, line:{color:"2A2000",width:1} });
+
+  s.addText("CINEMATCH", { x:M, y:2.1, w:W-2*M, h:1.1, margin:0,
+    align:"center", fontFace:HFONT, fontSize:64, color:AMBER, bold:true, shadow:shadow() });
+
+  s.addText("Thank You", { x:M, y:3.3, w:W-2*M, h:0.8, margin:0,
+    align:"center", fontFace:HFONT, fontSize:40, color:TEXT });
+
+  s.addShape(pres.shapes.RECTANGLE, { x:4.0, y:4.18, w:5.3, h:0.04, fill:{color:AMBER} });
+
+  s.addText("Questions?", { x:M, y:4.38, w:W-2*M, h:0.6, margin:0,
+    align:"center", fontFace:BFONT, fontSize:24, color:MUTED });
+
+  // Member grid
+  const names = ["[Member 1]","[Member 2]","[Member 3]","[Member 4]","[Member 5]","[Member 6]"];
+  names.forEach((name, i) => {
+    const x = M + (i % 3) * 3.8 + 0.8;
+    const y = 5.2 + Math.floor(i / 3) * 0.55;
+    s.addText(name, { x, y, w:3.5, h:0.45, margin:0,
+      fontFace:BFONT, fontSize:13, color:MUTED, align:"center" });
+  });
+
+  s.addText("Advanced C Programming  ·  Sejong University  ·  2024",
+    { x:M, y:H-0.5, w:W-2*M, h:0.3, margin:0,
+      align:"center", fontFace:BFONT, fontSize:9, color:BORDER });
+})();
+
+// ── Write file ───────────────────────────────────────────────────────────
+pres.writeFile({ fileName: "CINEMATCH-Presentation.pptx" }).then(() => {
+  console.log("✅  CINEMATCH-Presentation.pptx written  (17 slides, 6 members, 15 min)");
 });
-const guards = [
-  ["🔁", "Automatic retry", "On a 429 or 5xx error, the request retries after a short delay."],
-  ["🔑", "Keyword fallback", "If all AI fails, a local matcher still derives sensible preferences."],
-  ["📝", "Content fallback", "Empty AI fields are replaced with rich, well-written defaults."],
-];
-let gx = M;
-const gw = (W - 2*M - 2*0.5) / 3;
-guards.forEach(([ic, t, d]) => {
-  card(s, gx, 3.7, gw, 2.5);
-  s.addText(ic, { x: gx + 0.3, y: 3.95, w: 0.9, h: 0.8, margin: 0, fontSize: 26, align: "center" });
-  s.addText(t, { x: gx + 0.3, y: 4.75, w: gw - 0.6, h: 0.5, margin: 0, fontFace: BFONT, fontSize: 16, bold: true, color: AMBER });
-  s.addText(d, { x: gx + 0.3, y: 5.25, w: gw - 0.6, h: 0.9, margin: 0, fontFace: BFONT, fontSize: 13, color: TEXT, lineSpacingMultiple: 1.1 });
-  gx += gw + 0.5;
-});
-footer(s, 12);
-
-// ============================================================ 13. DEMO RESULTS
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Live Demo", "Rehearsed and reliable");
-const demos = [
-  ["🎮", "“relaxing cozy solo night”", "Balatro (2024)", "Cozy · Relaxed · ★ 9.0"],
-  ["🎬", "“scary horror with a group”", "Alien (1979)", "Horror · Intense · ★ 8.5"],
-  ["🎮", "“epic action game for hours”", "Super Mario Odyssey", "Action · Light · ★ 9.4"],
-];
-let dx = M;
-const dw = (W - 2*M - 2*0.5) / 3;
-demos.forEach(([ic, q, title, meta]) => {
-  card(s, dx, 2.3, dw, 3.6);
-  s.addText(q, { x: dx + 0.35, y: 2.6, w: dw - 0.7, h: 0.9, margin: 0, fontFace: HFONT, fontSize: 16, italic: true, color: MUTED, lineSpacingMultiple: 1.1 });
-  s.addShape(pres.shapes.LINE, { x: dx + 0.35, y: 3.6, w: dw - 0.7, h: 0, line: { color: BORDER, width: 1 } });
-  s.addText(ic, { x: dx, y: 3.8, w: dw, h: 0.9, align: "center", margin: 0, fontSize: 44 });
-  s.addText(title, { x: dx + 0.2, y: 4.75, w: dw - 0.4, h: 0.6, align: "center", margin: 0, fontFace: BFONT, fontSize: 18, bold: true, color: AMBER });
-  s.addText(meta, { x: dx + 0.2, y: 5.35, w: dw - 0.4, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 12.5, color: TEXT });
-  dx += dw + 0.5;
-});
-s.addText("Same mood → same pick, every time. The C engine is deterministic.",
-  { x: M, y: 6.2, w: W - 2*M, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 13, italic: true, color: MUTED });
-footer(s, 13);
-
-// ============================================================ 14. TESTING & EVALUATION
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Evaluation", "Testing the recommendation pipeline");
-const th = (t) => ({ text: t, options: { fill: { color: AMBER }, color: "1A1300", bold: true,
-  fontFace: BFONT, fontSize: 12.5, valign: "middle", margin: 5 } });
-const td = (t, opts = {}) => ({ text: t, options: { fill: { color: CARD }, color: TEXT,
-  fontFace: BFONT, fontSize: 12, valign: "middle", margin: 5, ...opts } });
-const okCell = () => td("✓ Pass", { color: TEAL, bold: true, align: "center" });
-const testRows = [
-  [th("Mood input"), th("Expected preferences"), th("Actual output"), th("Result")],
-  [td('"relaxing cozy solo night"'), td("Cozy · Relaxed · solo"), td("🎮 Balatro (2024)"), okCell()],
-  [td('"scary horror with a group"'), td("Horror · Intense · group"), td("🎬 Alien (1979)"), okCell()],
-  [td('"epic action game for hours"'), td("Action · long · solo"), td("🎮 Super Mario Odyssey"), okCell()],
-  [td('"thoughtful sci-fi, alone"'), td("Sci-Fi · deep · solo"), td("🎬 Arrival (2016)"), okCell()],
-];
-s.addTable(testRows, { x: M, y: 1.9, w: 11.9, colW: [3.7, 3.3, 2.9, 2.0], rowH: 0.46,
-  border: { type: "solid", pt: 1, color: BORDER }, valign: "middle" });
-s.addText("Edge cases handled", { x: M, y: 4.7, w: 8, h: 0.4, margin: 0,
-  fontFace: BFONT, fontSize: 15, bold: true, color: AMBER });
-const edges = [
-  ["🎭", "Mixed mood", "“happy but tense” → the AI picks the dominant signal; a valid pick still returns."],
-  ["⚡", "AI failure", "Rate-limit or error → keyword fallback derives preferences. Never crashes."],
-  ["🚫", "Empty input", "Blank text is rejected with a friendly message before any work runs."],
-  ["🔀", "Gibberish", "Unrecognised text falls back to safe default preferences — always a result."],
-];
-let ex = M;
-const ew = (11.9 - 3 * 0.4) / 4;
-edges.forEach(([ic, t, d]) => {
-  card(s, ex, 5.1, ew, 1.55, CARD2);
-  s.addText(ic, { x: ex + 0.22, y: 5.28, w: 0.6, h: 0.5, margin: 0, fontSize: 20 });
-  s.addText(t, { x: ex + 0.78, y: 5.3, w: ew - 0.95, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 13.5, bold: true, color: TEXT });
-  s.addText(d, { x: ex + 0.22, y: 5.82, w: ew - 0.44, h: 0.78, margin: 0, fontFace: BFONT, fontSize: 10.5, color: MUTED, lineSpacingMultiple: 1.08 });
-  ex += ew + 0.4;
-});
-footer(s, 14);
-
-// ============================================================ 15. TECH STACK
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Under the Hood", "Tech stack & open data");
-const tech = [
-  ["Engine", "C → cinematch.exe"],
-  ["Backend", "Node.js + Express"],
-  ["Frontend", "Vite + React"],
-  ["Packages", "pnpm"],
-  ["AI", "OpenRouter (Qwen3)"],
-  ["Movies", "TMDB open dataset"],
-  ["Games", "RAWG open dataset"],
-  ["Version control", "Git + GitHub"],
-];
-const tcw = (W - 2*M - 3*0.4) / 4, tch = 1.7;
-let ti = 0;
-for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) {
-  const tx = M + c * (tcw + 0.4), ty = 2.3 + r * (tch + 0.4);
-  const [t, d] = tech[ti++];
-  card(s, tx, ty, tcw, tch, CARD2);
-  s.addShape(pres.shapes.RECTANGLE, { x: tx, y: ty, w: tcw, h: 0.09, fill: { color: AMBER } });
-  s.addText(t.toUpperCase(), { x: tx + 0.2, y: ty + 0.35, w: tcw - 0.4, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 11, bold: true, color: MUTED, charSpacing: 1 });
-  s.addText(d, { x: tx + 0.2, y: ty + 0.8, w: tcw - 0.4, h: 0.7, margin: 0, fontFace: BFONT, fontSize: 15, bold: true, color: TEXT });
-}
-footer(s, 15);
-
-// ============================================================ 16. LIMITATIONS & FUTURE WORK
-s = pres.addSlide();
-s.background = { color: BG };
-header(s, "Looking Ahead", "Limitations & future work");
-// left — current limitations
-card(s, M, 2.0, 5.7, 4.5, CARD2);
-s.addText("⚠  Current limitations", { x: M + 0.35, y: 2.25, w: 5.0, h: 0.4, margin: 0,
-  fontFace: BFONT, fontSize: 16, bold: true, color: TEXT });
-s.addText([
-  { text: "No user accounts — the app is stateless", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
-  { text: "Recommends only from the 55-title curated library", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
-  { text: "Runs locally — not yet deployed publicly", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
-  { text: "Free AI models can be slow or rate-limited", options: { bullet: true } },
-], { x: M + 0.4, y: 2.9, w: 4.95, h: 3.4, margin: 0, fontFace: BFONT, fontSize: 13.5, color: MUTED, valign: "top" });
-// right — future work roadmap
-card(s, 6.9, 2.0, 5.7, 4.5, CARD);
-s.addText("🚀  Future work", { x: 7.25, y: 2.25, w: 5.0, h: 0.4, margin: 0,
-  fontFace: BFONT, fontSize: 16, bold: true, color: AMBER });
-const future = [
-  "User profiles & saved watch history",
-  "Personalization that learns from your feedback",
-  "Larger library — recommend from TMDB & RAWG directly",
-  "Deployment: web hosting + database integration",
-  "Automated tests (TDD) for the domain layer",
-];
-const futureRuns = [];
-future.forEach((t, i) => {
-  futureRuns.push({ text: (i + 1) + ".  ", options: { bold: true, color: AMBER, fontFace: BFONT, fontSize: 13.5 } });
-  futureRuns.push({ text: t, options: { color: TEXT, breakLine: true, paraSpaceAfter: 13, fontFace: BFONT, fontSize: 13.5 } });
-});
-s.addText(futureRuns, { x: 7.3, y: 2.9, w: 4.95, h: 3.4, margin: 0, valign: "top" });
-footer(s, 16);
-
-// ============================================================ 17. CLOSING
-s = pres.addSlide();
-s.background = { color: BG };
-s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.12, fill: { color: AMBER } });
-s.addText("🎬", { x: 0, y: 1.7, w: W, h: 1.2, align: "center", fontSize: 60, margin: 0 });
-s.addText("Classic C meets modern AI.", { x: 0, y: 3.0, w: W, h: 0.9, align: "center", margin: 0,
-  fontFace: HFONT, fontSize: 40, bold: true, color: AMBER });
-s.addText("A focused idea, executed cleanly — deterministic logic in C, language in an LLM,\nwrapped in a polished, well-architected product.",
-  { x: 0, y: 4.0, w: W, h: 1.0, align: "center", margin: 0, fontFace: BFONT, fontSize: 16, color: TEXT, lineSpacingMultiple: 1.2 });
-s.addShape(pres.shapes.LINE, { x: W/2 - 1.5, y: 5.3, w: 3, h: 0, line: { color: BORDER, width: 1 } });
-s.addText("Thank you", { x: 0, y: 5.5, w: W, h: 0.5, align: "center", margin: 0, fontFace: HFONT, fontSize: 22, bold: true, color: TEXT });
-s.addText("github.com/zubaydullayevasliddin06-cmd  ·  CINEMATCH", { x: 0, y: 6.1, w: W, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 12, color: MUTED });
-
-pres.writeFile({ fileName: "CINEMATCH-Presentation.pptx" }).then(f => console.log("Slides written:", f));
