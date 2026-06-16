@@ -468,7 +468,44 @@ s.addText("Same mood → same pick, every time. The C engine is deterministic.",
   { x: M, y: 6.2, w: W - 2*M, h: 0.4, align: "center", margin: 0, fontFace: BFONT, fontSize: 13, italic: true, color: MUTED });
 footer(s, 13);
 
-// ============================================================ 14. TECH STACK
+// ============================================================ 14. TESTING & EVALUATION
+s = pres.addSlide();
+s.background = { color: BG };
+header(s, "Evaluation", "Testing the recommendation pipeline");
+const th = (t) => ({ text: t, options: { fill: { color: AMBER }, color: "1A1300", bold: true,
+  fontFace: BFONT, fontSize: 12.5, valign: "middle", margin: 5 } });
+const td = (t, opts = {}) => ({ text: t, options: { fill: { color: CARD }, color: TEXT,
+  fontFace: BFONT, fontSize: 12, valign: "middle", margin: 5, ...opts } });
+const okCell = () => td("✓ Pass", { color: TEAL, bold: true, align: "center" });
+const testRows = [
+  [th("Mood input"), th("Expected preferences"), th("Actual output"), th("Result")],
+  [td('"relaxing cozy solo night"'), td("Cozy · Relaxed · solo"), td("🎮 Balatro (2024)"), okCell()],
+  [td('"scary horror with a group"'), td("Horror · Intense · group"), td("🎬 Alien (1979)"), okCell()],
+  [td('"epic action game for hours"'), td("Action · long · solo"), td("🎮 Super Mario Odyssey"), okCell()],
+  [td('"thoughtful sci-fi, alone"'), td("Sci-Fi · deep · solo"), td("🎬 Arrival (2016)"), okCell()],
+];
+s.addTable(testRows, { x: M, y: 1.9, w: 11.9, colW: [3.7, 3.3, 2.9, 2.0], rowH: 0.46,
+  border: { type: "solid", pt: 1, color: BORDER }, valign: "middle" });
+s.addText("Edge cases handled", { x: M, y: 4.7, w: 8, h: 0.4, margin: 0,
+  fontFace: BFONT, fontSize: 15, bold: true, color: AMBER });
+const edges = [
+  ["🎭", "Mixed mood", "“happy but tense” → the AI picks the dominant signal; a valid pick still returns."],
+  ["⚡", "AI failure", "Rate-limit or error → keyword fallback derives preferences. Never crashes."],
+  ["🚫", "Empty input", "Blank text is rejected with a friendly message before any work runs."],
+  ["🔀", "Gibberish", "Unrecognised text falls back to safe default preferences — always a result."],
+];
+let ex = M;
+const ew = (11.9 - 3 * 0.4) / 4;
+edges.forEach(([ic, t, d]) => {
+  card(s, ex, 5.1, ew, 1.55, CARD2);
+  s.addText(ic, { x: ex + 0.22, y: 5.28, w: 0.6, h: 0.5, margin: 0, fontSize: 20 });
+  s.addText(t, { x: ex + 0.78, y: 5.3, w: ew - 0.95, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 13.5, bold: true, color: TEXT });
+  s.addText(d, { x: ex + 0.22, y: 5.82, w: ew - 0.44, h: 0.78, margin: 0, fontFace: BFONT, fontSize: 10.5, color: MUTED, lineSpacingMultiple: 1.08 });
+  ex += ew + 0.4;
+});
+footer(s, 14);
+
+// ============================================================ 15. TECH STACK
 s = pres.addSlide();
 s.background = { color: BG };
 header(s, "Under the Hood", "Tech stack & open data");
@@ -492,9 +529,42 @@ for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) {
   s.addText(t.toUpperCase(), { x: tx + 0.2, y: ty + 0.35, w: tcw - 0.4, h: 0.4, margin: 0, fontFace: BFONT, fontSize: 11, bold: true, color: MUTED, charSpacing: 1 });
   s.addText(d, { x: tx + 0.2, y: ty + 0.8, w: tcw - 0.4, h: 0.7, margin: 0, fontFace: BFONT, fontSize: 15, bold: true, color: TEXT });
 }
-footer(s, 14);
+footer(s, 15);
 
-// ============================================================ 15. CLOSING
+// ============================================================ 16. LIMITATIONS & FUTURE WORK
+s = pres.addSlide();
+s.background = { color: BG };
+header(s, "Looking Ahead", "Limitations & future work");
+// left — current limitations
+card(s, M, 2.0, 5.7, 4.5, CARD2);
+s.addText("⚠  Current limitations", { x: M + 0.35, y: 2.25, w: 5.0, h: 0.4, margin: 0,
+  fontFace: BFONT, fontSize: 16, bold: true, color: TEXT });
+s.addText([
+  { text: "No user accounts — the app is stateless", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
+  { text: "Recommends only from the 55-title curated library", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
+  { text: "Runs locally — not yet deployed publicly", options: { bullet: true, breakLine: true, paraSpaceAfter: 11 } },
+  { text: "Free AI models can be slow or rate-limited", options: { bullet: true } },
+], { x: M + 0.4, y: 2.9, w: 4.95, h: 3.4, margin: 0, fontFace: BFONT, fontSize: 13.5, color: MUTED, valign: "top" });
+// right — future work roadmap
+card(s, 6.9, 2.0, 5.7, 4.5, CARD);
+s.addText("🚀  Future work", { x: 7.25, y: 2.25, w: 5.0, h: 0.4, margin: 0,
+  fontFace: BFONT, fontSize: 16, bold: true, color: AMBER });
+const future = [
+  "User profiles & saved watch history",
+  "Personalization that learns from your feedback",
+  "Larger library — recommend from TMDB & RAWG directly",
+  "Deployment: web hosting + database integration",
+  "Automated tests (TDD) for the domain layer",
+];
+const futureRuns = [];
+future.forEach((t, i) => {
+  futureRuns.push({ text: (i + 1) + ".  ", options: { bold: true, color: AMBER, fontFace: BFONT, fontSize: 13.5 } });
+  futureRuns.push({ text: t, options: { color: TEXT, breakLine: true, paraSpaceAfter: 13, fontFace: BFONT, fontSize: 13.5 } });
+});
+s.addText(futureRuns, { x: 7.3, y: 2.9, w: 4.95, h: 3.4, margin: 0, valign: "top" });
+footer(s, 16);
+
+// ============================================================ 17. CLOSING
 s = pres.addSlide();
 s.background = { color: BG };
 s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.12, fill: { color: AMBER } });
