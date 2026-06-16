@@ -96,23 +96,16 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
     { x:M, y:3.95, w:W-2*M, h:0.4, margin:0, align:"center",
       fontFace:BFONT, fontSize:14, color:MUTED });
 
-  // Team columns
-  const members = [
-    ["Member 1","[Name]"], ["Member 2","[Name]"], ["Member 3","[Name]"],
-    ["Member 4","[Name]"], ["Member 5","[Name]"], ["Member 6","[Name]"],
-  ];
-  const cols = [[members[0],members[1],members[2]], [members[3],members[4],members[5]]];
-  cols.forEach((col, ci) => {
-    col.forEach(([role,name], ri) => {
-      const x = 3.5 + ci * 3.3, y = 4.55 + ri * 0.38;
-      s.addText(role + "  ", { x, y, w:1.3, h:0.34, margin:0,
-        fontFace:BFONT, fontSize:12, color:AMBER, bold:true, align:"right" });
-      s.addText(name, { x:x+1.35, y, w:1.9, h:0.34, margin:0,
-        fontFace:BFONT, fontSize:12, color:TEXT });
-    });
+  // Team names — 2 columns of 3
+  const names = ["[Name]","[Name]","[Name]","[Name]","[Name]","[Name]"];
+  names.forEach((name, i) => {
+    const x = 3.8 + (i % 2) * 3.2;
+    const y = 4.55 + Math.floor(i / 2) * 0.42;
+    s.addText(name, { x, y, w:2.8, h:0.36, margin:0,
+      align:"center", fontFace:BFONT, fontSize:13, color:TEXT });
   });
 
-  footer(s, 1, null);
+  footer(s, 1);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
