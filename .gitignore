@@ -3,6 +3,9 @@
 server/.env
 web/.env.local
 
+# User database — contains passwords, never commit
+server/data/
+
 # Node dependencies (re-created with "pnpm install")
 node_modules/
 

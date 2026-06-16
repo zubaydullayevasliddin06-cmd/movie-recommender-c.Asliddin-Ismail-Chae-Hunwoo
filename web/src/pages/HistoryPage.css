@@ -1,0 +1,126 @@
+.history-page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.history-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent, #FFB347);
+  margin: 0 0 4px;
+}
+
+.history-subtitle {
+  color: var(--muted, #9ca3af);
+  margin: 0 0 32px;
+  font-size: 0.95rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #13151f;
+  border: 1px solid #1e2130;
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: border-color 0.15s;
+}
+.history-card:hover { border-color: #2a2d3e; }
+
+.history-badge {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #e2e8f0);
+}
+
+.history-year {
+  color: var(--muted, #9ca3af);
+  font-weight: 400;
+}
+
+.history-mood {
+  font-size: 0.85rem;
+  color: var(--accent, #FFB347);
+  margin: 4px 0;
+  font-style: italic;
+}
+
+.history-explain {
+  font-size: 0.85rem;
+  color: var(--muted, #9ca3af);
+  margin: 6px 0 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.history-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.history-rating {
+  color: var(--accent, #FFB347);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.history-date {
+  color: var(--muted, #9ca3af);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Empty / loading states */
+.history-empty {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.history-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+}
+
+.history-empty h2 {
+  font-size: 1.4rem;
+  color: var(--text, #e2e8f0);
+  margin: 0 0 12px;
+}
+
+.history-empty p {
+  color: var(--muted, #9ca3af);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.history-loading {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--muted, #9ca3af);
+}

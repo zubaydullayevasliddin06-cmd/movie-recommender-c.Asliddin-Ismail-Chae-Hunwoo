@@ -1,17 +1,20 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import './AiPage.css'
 
 export default function AiPage() {
+  const { user, authHeader } = useAuth()
   const [text, setText]       = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const [result, setResult]   = useState(null)
+  const [saved, setSaved]     = useState(false)
 
   async function findMatch(e) {
     e.preventDefault()
     const value = text.trim()
     if (!value) return
-    setLoading(true); setError(''); setResult(null)
+    setLoading(true); setError(''); setResult(null); setSaved(false)
     try {
       const res  = await fetch('/api/recommend', {
         method: 'POST',
@@ -21,6 +24,26 @@ export default function AiPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
       setResult(data)
+
+      // Auto-save to history if the user is logged in.
+      if (user && data.title) {
+        fetch('/api/history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
+          body: JSON.stringify({
+            title:       data.title.title,
+            type:        data.title.type,
+            year:        data.title.year,
+            genre:       data.title.genre,
+            mood:        data.title.mood,
+            rating:      data.title.rating,
+            mood_input:  value,
+            explanation: data.explanation,
+          }),
+        })
+          .then(r => r.ok && setSaved(true))
+          .catch(() => {})
+      }
     } catch (err) {
       setError(err.message)
     } finally {
@@ -73,6 +96,12 @@ export default function AiPage() {
               </div>
             </div>
             <p className="ai-why">{result.explanation}</p>
+            {saved && (
+              <p className="ai-saved">✓ Saved to your history</p>
+            )}
+            {!user && (
+              <p className="ai-save-hint">Log in to save this pick to your history.</p>
+            )}
           </section>
         )}
       </div>

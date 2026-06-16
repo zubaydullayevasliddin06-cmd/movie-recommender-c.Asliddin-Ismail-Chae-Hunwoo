@@ -87,3 +87,17 @@
   flex-shrink: 0;
 }
 .ai-arrow { color: var(--muted); font-size: 1.2rem; }
+
+.ai-saved {
+  margin: 12px 0 0;
+  color: #4ade80;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ai-save-hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
