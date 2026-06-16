@@ -42,17 +42,11 @@ function header(slide, kicker, title) {
   slide.addText(title, { x:M, y:0.85, w:W-2*M, h:0.8, margin:0,
     fontFace:HFONT, fontSize:32, color:TEXT, bold:true });
 }
-function footer(slide, n, member) {
+function footer(slide, n) {
   slide.addText([
     { text:"CINEMATCH", options:{color:AMBER,bold:true} },
     { text:"   ·   AI-Powered Movie & Game Recommender", options:{color:MUTED} },
   ], { x:M, y:H-0.5, w:9, h:0.3, margin:0, fontFace:BFONT, fontSize:9 });
-  if (member) {
-    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x:W-2.8, y:H-0.55, w:1.4, h:0.28,
-      rectRadius:0.06, fill:{color:CARD}, line:{color:BORDER,width:1} });
-    slide.addText(`Member ${member}`, { x:W-2.8, y:H-0.55, w:1.4, h:0.28, margin:0,
-      align:"center", fontFace:BFONT, fontSize:9, color:AMBER, bold:true });
-  }
   slide.addText(String(n), { x:W-1.0, y:H-0.5, w:0.4, h:0.3, margin:0,
     align:"right", fontFace:BFONT, fontSize:9, color:MUTED });
 }
@@ -69,13 +63,6 @@ function codeBlock(slide, x, y, w, h, lines, fontSize=11) {
   }));
   slide.addText(runs, { x:x+0.3, y:y+0.45, w:w-0.55, h:h-0.65,
     margin:0, valign:"top", align:"left", lineSpacingMultiple:1.05 });
-}
-function memberTag(slide, n, color = AMBER) {
-  const labels = {1:"Introduction",2:"Features",3:"C Engine",4:"AI & APIs",5:"Backend",6:"Conclusion"};
-  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x:W-2.8, y:0.42, w:2.1, h:0.32,
-    rectRadius:0.06, fill:{color:CARD}, line:{color:color,width:2} });
-  slide.addText(`◀  Member ${n}  ·  ${labels[n]}`, { x:W-2.8, y:0.42, w:2.1, h:0.32,
-    margin:0, align:"center", fontFace:BFONT, fontSize:9.5, color:color, bold:true });
 }
 function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
   const runs = items.map(t => ({
@@ -133,8 +120,8 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide2() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 1  ·  Introduction", "The Problem");
-  memberTag(s, 1);
+  header(s, "Introduction", "The Problem");
+
 
   // Large quote box
   card(s, M, 1.85, W-2*M, 1.35, CARD);
@@ -158,7 +145,7 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
       fontFace:BFONT, fontSize:12, color:TEXT, align:"center", lineSpacingMultiple:1.3 });
   });
 
-  footer(s, 2, 1);
+  footer(s, 2);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -166,8 +153,8 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide3() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 1  ·  Introduction", "CINEMATCH — The Solution");
-  memberTag(s, 1);
+  header(s, "Introduction", "CINEMATCH — The Solution");
+
 
   // User input example
   card(s, M, 1.85, 5.8, 0.75, CARD2);
@@ -203,7 +190,7 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
     }
   });
 
-  footer(s, 3, 1);
+  footer(s, 3);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -211,8 +198,8 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide4() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 2  ·  Features", "5 Features of CINEMATCH");
-  memberTag(s, 2);
+  header(s, "Features", "5 Features of CINEMATCH");
+
 
   const features = [
     ["✨","AI Match","Describe your mood → AI + C engine\nrecommends the perfect title\nwith a personalized explanation"],
@@ -236,7 +223,7 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
       fill:{color:AMBER} });
   });
 
-  footer(s, 4, 2);
+  footer(s, 4);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -244,8 +231,8 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide5() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 2  ·  Features", "What Makes Each Feature Special");
-  memberTag(s, 2);
+  header(s, "Features", "What Makes Each Feature Special");
+
 
   // Left column
   const lx = M, rx = M + 6.1, cy = 1.9, ch = 1.35, gap2 = 1.5;
@@ -271,7 +258,7 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
       fontFace:BFONT, fontSize:11.5, color:TEXT, lineSpacingMultiple:1.25 });
   });
 
-  footer(s, 5, 2);
+  footer(s, 5);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -279,8 +266,8 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide6() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 3  ·  Architecture & C Engine", "System Architecture — Domain-Driven Design");
-  memberTag(s, 3);
+  header(s, "Architecture & C Engine", "System Architecture — Domain-Driven Design");
+
 
   // DDD 4 layers horizontal
   const layers = [
@@ -314,7 +301,7 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
     { x:M+0.3, y:6.38, w:W-2*M-0.6, h:0.43, margin:0,
       fontFace:BFONT, fontSize:12, color:AMBER });
 
-  footer(s, 6, 3);
+  footer(s, 6);
 })();
 
 function slide_card_border(s, x, y, w, h, fill, borderColor) {
@@ -327,8 +314,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide7() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 3  ·  Architecture & C Engine", "C Engine — Data Structure & Scoring Algorithm");
-  memberTag(s, 3);
+  header(s, "Architecture & C Engine", "C Engine — Data Structure & Scoring Algorithm");
+
 
   // Code block left: Title struct
   codeBlock(s, M, 1.85, 6.0, 2.5, [
@@ -388,7 +375,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     }
   });
 
-  footer(s, 7, 3);
+  footer(s, 7);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -396,8 +383,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide8() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 3  ·  Architecture & C Engine", "C Engine — Engine Mode & Node.js Integration");
-  memberTag(s, 3);
+  header(s, "Architecture & C Engine", "C Engine — Engine Mode & Node.js Integration");
+
 
   // Left: main.c engine mode branch
   codeBlock(s, M, 1.85, 6.0, 2.85, [
@@ -449,7 +436,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
       paraSpaceAfter:5, bullet:{code:"25CF",indent:14,color:AMBER} } }));
   s.addText(runs2, { x:7.1, y:5.45, w:5.2, h:1.15, margin:0, valign:"top" });
 
-  footer(s, 8, 3);
+  footer(s, 8);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -457,8 +444,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide9() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 4  ·  AI & APIs", "AI Integration — OpenRouter & Fallback Chain");
-  memberTag(s, 4);
+  header(s, "AI & APIs", "AI Integration — OpenRouter & Fallback Chain");
+
 
   // What is OpenRouter
   card(s, M, 1.85, 5.8, 1.45, CARD);
@@ -509,7 +496,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     { x:7.1, y:2.4, w:5.2, h:0.8, margin:0,
       fontFace:BFONT, fontSize:12, color:TEXT, lineSpacingMultiple:1.3 });
 
-  footer(s, 9, 4);
+  footer(s, 9);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -517,8 +504,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide10() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 4  ·  AI & APIs", "AI Pipeline — Mood → Preferences → Explanation");
-  memberTag(s, 4);
+  header(s, "AI & APIs", "AI Pipeline — Mood → Preferences → Explanation");
+
 
   // Task 1
   card(s, M, 1.85, 5.8, 4.85, CARD);
@@ -572,7 +559,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
       paraSpaceAfter:8, bullet:{code:"25CF",indent:14,color:AMBER} } }));
   s.addText(runs3, { x:7.1, y:5.08, w:5.2, h:1.5, margin:0, valign:"top" });
 
-  footer(s, 10, 4);
+  footer(s, 10);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -580,8 +567,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide11() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 4  ·  AI & APIs", "External APIs — TMDB & RAWG");
-  memberTag(s, 4);
+  header(s, "AI & APIs", "External APIs — TMDB & RAWG");
+
 
   // TMDB card
   card(s, M, 1.85, 5.85, 4.85);
@@ -626,7 +613,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     { x:M+0.3, y:6.88, w:W-2*M-0.6, h:0.35, margin:0,
       fontFace:BFONT, fontSize:11.5, color:AMBER });
 
-  footer(s, 11, 4);
+  footer(s, 11);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -634,8 +621,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide12() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 5  ·  Backend", "Backend — Express Server & API Endpoints");
-  memberTag(s, 5);
+  header(s, "Backend", "Backend — Express Server & API Endpoints");
+
 
   // Endpoint table
   const endpoints = [
@@ -678,7 +665,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     { x:M+0.3, y:6.22, w:W-2*M-0.6, h:0.35, margin:0,
       fontFace:BFONT, fontSize:11.5, color:MUTED, italic:true });
 
-  footer(s, 12, 5);
+  footer(s, 12);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -686,8 +673,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide13() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 5  ·  Backend", "User Authentication — bcrypt + JWT");
-  memberTag(s, 5);
+  header(s, "Backend", "User Authentication — bcrypt + JWT");
+
 
   // Registration flow
   card(s, M, 1.85, 5.85, 2.55, CARD);
@@ -739,7 +726,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     ["// Gitignored — never in GitHub", "c"],
   ], 11);
 
-  footer(s, 13, 5);
+  footer(s, 13);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -747,8 +734,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide14() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 6  ·  Conclusion", "Complete Data Flow — Request Lifecycle");
-  memberTag(s, 6);
+  header(s, "Conclusion", "Complete Data Flow — Request Lifecycle");
+
 
   const steps = [
     ["1","React Frontend","User types mood & submits\n\nPOST /api/recommend\n{ text: 'scary short…' }"],
@@ -783,7 +770,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
     { x:M+0.3, y:6.88, w:W-2*M-0.6, h:0.33, margin:0,
       fontFace:BFONT, fontSize:12, color:MUTED });
 
-  footer(s, 14, 6);
+  footer(s, 14);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -791,8 +778,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide15() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 6  ·  Conclusion", "Testing & Evaluation");
-  memberTag(s, 6);
+  header(s, "Conclusion", "Testing & Evaluation");
+
 
   // Test table
   const cols = ["Mood Input","Expected Genre / Context","Actual Result","Status"];
@@ -838,7 +825,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
       fontFace:BFONT, fontSize:11, color:TEXT, align:"center", lineSpacingMultiple:1.25 });
   });
 
-  footer(s, 15, 6);
+  footer(s, 15);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
@@ -846,8 +833,8 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
 // ════════════════════════════════════════════════════════════════════════
 (function slide16() {
   const s = pres.addSlide(); s.background = {color:BG};
-  header(s, "Member 6  ·  Conclusion", "Limitations & Future Work");
-  memberTag(s, 6);
+  header(s, "Conclusion", "Limitations & Future Work");
+
 
   // Left: Limitations
   card(s, M, 1.85, 5.85, 4.85, CARD);
@@ -885,7 +872,7 @@ function slide_card_border(s, x, y, w, h, fill, borderColor) {
       fontFace:BFONT, fontSize:11.5, color:MUTED });
   });
 
-  footer(s, 16, 6);
+  footer(s, 16);
 })();
 
 // ════════════════════════════════════════════════════════════════════════
