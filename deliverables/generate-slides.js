@@ -96,15 +96,6 @@ function bullet2(slide, x, y, items, color = AMBER, fontSize = 12.5) {
     { x:M, y:3.95, w:W-2*M, h:0.4, margin:0, align:"center",
       fontFace:BFONT, fontSize:14, color:MUTED });
 
-  // Team names — 2 columns of 3
-  const names = ["[Name]","[Name]","[Name]","[Name]","[Name]","[Name]"];
-  names.forEach((name, i) => {
-    const x = 3.8 + (i % 2) * 3.2;
-    const y = 4.55 + Math.floor(i / 2) * 0.42;
-    s.addText(name, { x, y, w:2.8, h:0.36, margin:0,
-      align:"center", fontFace:BFONT, fontSize:13, color:TEXT });
-  });
-
   footer(s, 1);
 })();
 
